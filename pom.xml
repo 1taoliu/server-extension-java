@@ -26,6 +26,7 @@
         <module>server-extension-template</module>
         <module>examples/attribute-security-filter-soi</module>
         <module>examples/clustering-soe</module>
+        <module>examples/quantization-soe</module>
     </modules>
     <properties>
         <jdk.version>1.8</jdk.version>

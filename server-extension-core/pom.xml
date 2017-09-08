@@ -82,11 +82,19 @@
             <version>2.25.1</version>
         </dependency>
         <dependency>
+            <groupId>com.esri</groupId>
+            <artifactId>arcobjects</artifactId>
+            <version>10.5.1</version>
+            <scope>provided</scope>
+        </dependency>
+<!--
+        <dependency>
             <groupId>com.esri.arcgis</groupId>
             <artifactId>arcobjects</artifactId>
             <version>${com.esri.arcgis.version}</version>
             <scope>system</scope>
             <systemPath>${env.AGSSERVER}\framework\lib\arcobjects.jar</systemPath>
         </dependency>
+        -->
     </dependencies>
 </project>

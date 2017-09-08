@@ -14,11 +14,51 @@
 
 package com.esri.serverextension.core.rest.api;
 
+import com.esri.arcgis.geodatabase.esriFieldType;
+
 import java.io.Serializable;
 
 import javax.xml.bind.annotation.XmlType;
 
 @XmlType
 public enum FieldType implements Serializable {
-	esriFieldTypeSmallInteger, esriFieldTypeInteger, esriFieldTypeSingle, esriFieldTypeDouble, esriFieldTypeString, esriFieldTypeDate, esriFieldTypeOID, esriFieldTypeGeometry, esriFieldTypeBlob, esriFieldTypeRaster, esriFieldTypeGUID, esriFieldTypeGlobalID, esriFieldTypeXML
+	esriFieldTypeSmallInteger, esriFieldTypeInteger, esriFieldTypeSingle, esriFieldTypeDouble,
+	esriFieldTypeString, esriFieldTypeDate, esriFieldTypeOID, esriFieldTypeGeometry, esriFieldTypeBlob,
+	esriFieldTypeRaster, esriFieldTypeGUID, esriFieldTypeGlobalID, esriFieldTypeXML;
+
+	static public FieldType convertIntegerTypeToFieldType(int intType)
+	{
+		switch(intType){
+			case esriFieldType.esriFieldTypeBlob:
+				return FieldType.esriFieldTypeBlob;
+			case esriFieldType.esriFieldTypeDate:
+				return FieldType.esriFieldTypeDate;
+			case esriFieldType.esriFieldTypeDouble:
+				return FieldType.esriFieldTypeDouble;
+			case esriFieldType.esriFieldTypeGeometry:
+				return FieldType.esriFieldTypeGeometry;
+			case esriFieldType.esriFieldTypeGlobalID:
+				return FieldType.esriFieldTypeGlobalID;
+			case esriFieldType.esriFieldTypeGUID:
+				return FieldType.esriFieldTypeGUID;
+			case esriFieldType.esriFieldTypeInteger:
+				return FieldType.esriFieldTypeInteger;
+			case esriFieldType.esriFieldTypeOID:
+				return FieldType.esriFieldTypeOID;
+			case esriFieldType.esriFieldTypeRaster:
+				return FieldType.esriFieldTypeRaster;
+			case esriFieldType.esriFieldTypeSingle:
+				return FieldType.esriFieldTypeSingle;
+			case esriFieldType.esriFieldTypeSmallInteger:
+				return FieldType.esriFieldTypeSmallInteger;
+			default:
+			case esriFieldType.esriFieldTypeString:
+				return FieldType.esriFieldTypeString;
+			case esriFieldType.esriFieldTypeXML:
+				return FieldType.esriFieldTypeXML;
+		}
+
+
+	}
+
 }

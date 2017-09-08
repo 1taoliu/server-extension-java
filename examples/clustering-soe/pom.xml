@@ -32,6 +32,13 @@
             <artifactId>server-extension-core</artifactId>
             <version>${project.parent.version}</version>
         </dependency>
+        <dependency>
+            <groupId>com.esri</groupId>
+            <artifactId>arcobjects</artifactId>
+            <version>10.5.1</version>
+            <scope>provided</scope>
+        </dependency>
+
     </dependencies>
     <build>
         <resources>
