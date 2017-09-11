@@ -193,14 +193,48 @@ public class QuantizationCallbackHandler implements GeodatabaseObjectCallbackHan
 
         return tally;
 
-        //return pgon; //TODO: implement quantize polygon
     }
-
-
     private ArrayList<SimplePoint> getAndQuantize(IPointCollection4 ptCollection) throws IOException{
         ArrayList<SimplePoint> retList = new ArrayList<SimplePoint>();
         SimplePoint lastPoint = null;
         int ptCount = ptCollection.getPointCount();
+
+        GeometryEnvironment gBridge = new GeometryEnvironment();
+
+
+        _WKSPoint[][] wksPointBuffer = new _WKSPoint[1][ptCount];
+        for (int j=0;j<ptCount;j++){
+            wksPointBuffer[0][j] = new _WKSPoint();
+        }
+
+        gBridge.queryWKSPoints(ptCollection, 0, wksPointBuffer);
+
+        for (int i=0;i<ptCount;i++){
+
+            //IPoint ipt = ptCollection.getPoint(i);
+            _WKSPoint pt = wksPointBuffer[0][i];
+
+            //SimplePoint pt = new SimplePoint(snapX(ipt.getX()), snapY(ipt.getY()));
+            long xx = snapX(pt.x);
+            long yy = snapY(pt.y);
+
+            if (lastPoint == null || !lastPoint.equals(xx,yy)){
+                lastPoint = new SimplePoint(xx,yy);
+                retList.add(lastPoint);
+            }
+
+        }
+        return retList;
+    }
+
+    /*
+    private ArrayList<SimplePoint> getAndQuantize(IPointCollection4 ptCollection) throws IOException{
+        ArrayList<SimplePoint> retList = new ArrayList<SimplePoint>();
+        SimplePoint lastPoint = null;
+        int ptCount = ptCollection.getPointCount();
+
+
+
         for (int i=0;i<ptCount;i++){
 
             IPoint ipt = ptCollection.getPoint(i);
@@ -217,6 +251,7 @@ public class QuantizationCallbackHandler implements GeodatabaseObjectCallbackHan
         }
         return retList;
     }
+    */
 
     //the two function below assume upper left
 
