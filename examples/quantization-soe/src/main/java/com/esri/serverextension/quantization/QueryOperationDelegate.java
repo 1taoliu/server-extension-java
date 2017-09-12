@@ -15,7 +15,10 @@ package com.esri.serverextension.quantization;
 
 import com.esri.arcgis.carto.IMapLayerInfo;
 import com.esri.arcgis.geodatabase.*;
+import com.esri.arcgis.geometry.IJSONConverterGeometry;
 import com.esri.arcgis.geometry.ISpatialReference;
+import com.esri.arcgis.geometry.JSONConverterGeometry;
+import com.esri.arcgis.system.IJSONObject;
 import com.esri.serverextension.core.geodatabase.GeodatabaseTemplate;
 import com.esri.serverextension.core.rest.api.Field;
 import com.esri.serverextension.core.rest.api.FieldType;
@@ -63,7 +66,7 @@ public class QueryOperationDelegate {
 
 
     @RequestMapping("/layers/0/query")
-    public JSONObject query(
+    public RestResponse query(
             RestRequest request,
             RestDelegate handler,
             ServerObjectExtensionContext serverContext,
@@ -76,7 +79,7 @@ public class QueryOperationDelegate {
                 requestInput, QuantizationQueryOperationInput.class);
 
 
-      //  if (quantizationInput.getResultType().equalsIgnoreCase("tile")){
+        if (quantizationInput != null && quantizationInput.getResultType() != null && quantizationInput.getResultType().equalsIgnoreCase("tile")){
 
             IMapLayerInfo layerInfo = MapServerUtilities.getPolygonFeatureLayerByID(layerId, serverContext);
 
@@ -94,7 +97,7 @@ public class QueryOperationDelegate {
 
 
 
-        QuantizationCallbackHandler quantizationCallbackHandler = new QuantizationCallbackHandler(quantizationInput.getQuantizationParameters());
+        QuantizationCallbackHandler quantizationCallbackHandler = new QuantizationCallbackHandler(quantizationInput, featureClass.getShapeFieldName());
             GeodatabaseTemplate geodatabaseTemplate = new GeodatabaseTemplate();
             geodatabaseTemplate.query(featureClass, queryFilter, quantizationCallbackHandler);
 
@@ -115,8 +118,49 @@ public class QueryOperationDelegate {
             JSONObject rootResource = new JSONObject();
             rootResource.put("features", quantizationCallbackHandler.getQuantizationFeatures());
 
-            return rootResource;
- /*
+            JSONObject jsonTransform = new JSONObject();
+            jsonTransform.put("originPosition", "upperLeft");
+            JSONArray jsonScale = new JSONArray();
+            jsonScale.put(params.getTolerance());
+            jsonScale.put(params.getTolerance());
+            jsonTransform.put("scale", jsonScale);
+            JSONArray jsonTranslate = new JSONArray();
+            jsonTranslate.put(params.getExtent().getXmin());
+            jsonTranslate.put(params.getExtent().getYmax());
+            jsonTransform.put("translate", jsonTranslate);
+            rootResource.put("transform", jsonTransform);
+
+
+
+            ISpatialReference spRef = getOutSpatialReference(quantizationInput, serverContext);
+
+
+            IJSONObject jsonObject = new com.esri.arcgis.system.JSONObject();
+            IJSONConverterGeometry converterGeometry = new JSONConverterGeometry();
+            converterGeometry.queryJSONSpatialReference(spRef,
+                jsonObject);
+            String json = jsonObject.toJSONString(null);
+            JSONObject jsonSpatialReference = new JSONObject(json);
+
+            rootResource.put("spatialReference", jsonSpatialReference);
+
+            JSONArray jsonFields = new JSONArray();
+            List<Field> fields = quantizationCallbackHandler.getFieldList();
+            for (Field field:fields){
+                JSONObject jsonField = new JSONObject();
+                jsonField.put("alias", field.getAlias());
+                jsonField.put("name", field.getName());
+                jsonField.put("type", field.getType());
+                jsonFields.put(jsonField);
+            }
+            rootResource.put("fields", jsonFields);
+
+            rootResource.put("geometryType", "esriGeometryPolygon");
+            rootResource.put("objectIdFieldName", featureClass.getOIDFieldName());
+            byte[] data = rootResource.toString().getBytes("utf-8");
+            return new RestResponse(null, data);
+            //return rootResource;
+
         }
 
         else{
@@ -132,7 +176,7 @@ public class QueryOperationDelegate {
             return handler.process(filteredRequest, null);
 
         }
-*/
+
     }
 
 
@@ -161,6 +205,7 @@ public class QueryOperationDelegate {
                 if (input.getOutSR() != null) {
                     spatialFilter.setOutputSpatialReferenceByRef(shapeFieldName, input.getOutSR());
                 }
+
                 queryFilter = spatialFilter;
             } else {
                 queryFilter = new QueryFilter();
@@ -171,6 +216,23 @@ public class QueryOperationDelegate {
                 Cleaner.release(sqlCheck);
                 queryFilter.setWhereClause(input.getWhere());
             }
+
+            String outFields = input.getOutFields();
+            if (outFields != null && outFields.length()>0){
+                String allFields[] = outFields.split(",");
+                boolean bFoundShape = false;
+                for (String field:allFields){
+                    if (field.equalsIgnoreCase(shapeFieldName)){
+                        bFoundShape = true;
+                    }
+                }
+                if (!bFoundShape){
+                    outFields = outFields+","+shapeFieldName;
+                }
+                queryFilter.setSubFields(outFields);
+            }
+
+
             return queryFilter;
         } catch (IOException ex) {
             throw new ArcObjectsInteropException("Failed to create query filter.", ex);

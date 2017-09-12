@@ -28,17 +28,21 @@ import com.esri.serverextension.core.rest.api.Field;
 import com.esri.serverextension.core.rest.api.FieldType;
 
 import java.io.IOException;
+import java.nio.ByteBuffer;
+import java.nio.ByteOrder;
 import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import com.esri.arcgis.server.json.JSONObject;
 import com.esri.arcgis.server.json.JSONArray;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import sun.java2d.pipe.SpanShapeRenderer;
 
 
 public class QuantizationCallbackHandler implements GeodatabaseObjectCallbackHandler {
-
+    protected final Logger logger = LoggerFactory.getLogger(QuantizationCallbackHandler.class);
     private GeodatabaseFieldMap fieldMap;
     private QuantizationParameters quantizationParameters;
     private JSONArray quantizedFeatures = new JSONArray();
@@ -46,16 +50,20 @@ public class QuantizationCallbackHandler implements GeodatabaseObjectCallbackHan
     private double originX = 0.0;
     private double originY = 0.0;
     private double qTolerance = 1.0;
+    private String shapeFieldName;
+    private QuantizationQueryOperationInput input;
 
 
-    public QuantizationCallbackHandler(QuantizationParameters params) {
-        this.quantizationParameters = params;
-        if (params != null){
-            Extent extent = params.getExtent();
+    public QuantizationCallbackHandler(QuantizationQueryOperationInput input, String shapeFieldName) {
+        this.input = input;
+        this.quantizationParameters = input.getQuantizationParameters();
+        this.shapeFieldName = shapeFieldName;
+        if (this.quantizationParameters != null){
+            Extent extent = this.quantizationParameters.getExtent();
             if (extent != null){
                 originX = extent.getXmin();
                 originY = extent.getYmax();
-                qTolerance = params.getTolerance();
+                qTolerance = this.quantizationParameters.getTolerance();
             }
 
         }
@@ -110,9 +118,9 @@ public class QuantizationCallbackHandler implements GeodatabaseObjectCallbackHan
 
             JSONObject polyJson = quantizePolygon((IPolygon)geometry);
             Feature newFeature = new Feature();
-            newFeature.setAttributes(attributes);
+            //newFeature.setAttributes(attributes);
             //newFeature.setGeometry(quantizedPolygon);
-            newFeature.setGeometry(null);
+            //newFeature.setGeometry(null);
 
             JSONObject featureObject = new JSONObject();
 
@@ -120,17 +128,24 @@ public class QuantizationCallbackHandler implements GeodatabaseObjectCallbackHan
             //    layerObject.put("id", layerInfo.getID());
              //   layerObject.put("description", layerInfo.getDescription());
 
+            if (input.getReturnCentroid()){
+                JSONObject centroidObject = new JSONObject();
+                centroidObject.put("x", snapX(centroid.getX()));
+                centroidObject.put("y", snapY(centroid.getY()));
+                featureObject.put("centroid", centroidObject);
+            }
 
-            JSONObject centroidObject = new JSONObject();
-            centroidObject.put("x", snapX(centroid.getX()));
-            centroidObject.put("y", snapY(centroid.getY()));
 
-            featureObject.put("centroid", centroidObject);
             featureObject.put("geometry", polyJson);
 
-            //attributes
-            // centroid // x y
-            // geometry // rings
+            JSONObject jsonAttributes = new JSONObject();
+            for (Map.Entry<String, Object> entry:attributes.entrySet()){
+                if (!entry.getKey().equalsIgnoreCase(shapeFieldName)){
+                    jsonAttributes.put(entry.getKey(), entry.getValue().toString());
+                }
+            }
+            featureObject.put("attributes", jsonAttributes);
+
 
             quantizedFeatures.put(featureObject);
         }
@@ -156,6 +171,7 @@ public class QuantizationCallbackHandler implements GeodatabaseObjectCallbackHan
         JSONArray jsonRingsArray = new JSONArray();
         try {
 
+            /*
             IGeometryCollection collection = (IGeometryCollection)pgon;
             int numRings = collection.getGeometryCount();
             for (int i=0;i<numRings;i++){
@@ -181,9 +197,39 @@ public class QuantizationCallbackHandler implements GeodatabaseObjectCallbackHan
                 }
 
             }
+            */
+
+            IGeometryFactory2 geometryFactory2 = new GeometryEnvironment();
+
+
+            byte []wkbGeometry = (byte[]) geometryFactory2.createWkbVariantFromGeometry(pgon);
+
+            ArrayList<ArrayList<SimplePoint>> polygon = readPolygon(wkbGeometry);
+            for(ArrayList<SimplePoint> ring:polygon){
+
+                    JSONArray jsonRingArray = new JSONArray();
+                    SimplePoint lastPoint = null;
+                    for (SimplePoint pt:ring){
+                        JSONArray jsonPoint = new JSONArray();
+                        if (lastPoint != null){
+                            jsonPoint.put(pt.x-lastPoint.x);
+                            jsonPoint.put(pt.y-lastPoint.y);
+                        }else {
+                            jsonPoint.put(pt.x);
+                            jsonPoint.put(pt.y);
+                        }
+                        lastPoint = pt;
+                        jsonRingArray.put(jsonPoint);
+                    }
+                    jsonRingsArray.put(jsonRingArray);
+            }
+
+
+
 
         } catch (Exception e) {
-            e.printStackTrace();
+
+            logger.debug("Error", e);
             tally.put("Error", "1");
             return tally;
         }
@@ -193,6 +239,66 @@ public class QuantizationCallbackHandler implements GeodatabaseObjectCallbackHan
 
         return tally;
 
+    }
+
+
+    public  ArrayList<ArrayList<SimplePoint>> readPolygon(byte[] bytes){
+        ArrayList<ArrayList<SimplePoint>> allRings = new ArrayList<ArrayList<SimplePoint>>();
+        int byteOrder = bytes[0];
+        ByteBuffer buf = ByteBuffer.wrap(bytes);
+        if (byteOrder == 1){
+            buf.order(ByteOrder.LITTLE_ENDIAN);
+        }
+
+        buf.get();
+        int geomType = buf.getInt();
+        int numPolygons = 1;
+
+        if (geomType == 6){
+            numPolygons = buf.getInt();
+        }else if (geomType != 3){
+            return allRings;
+        }
+
+        for (int k=0;k<numPolygons;k++){
+
+            if (geomType == 6){
+                buf.get();//byteorder
+                buf.getInt();//wkbType
+            }
+
+            int numRings = buf.getInt();
+
+            for (int i=0;i<numRings;i++){
+                ArrayList<SimplePoint> ring = new ArrayList<SimplePoint>();
+                int numPoints = buf.getInt();
+                try {
+                    SimplePoint lastPoint = null;
+                    for (int j=0;j<numPoints;j++){
+                        double x =buf.getDouble();
+
+                        double y = buf.getDouble();
+                        long xx = snapX(x);
+                        long yy = snapY(y);
+
+                        if (lastPoint == null || !lastPoint.equals(xx,yy)){
+                            lastPoint = new SimplePoint(xx,yy);
+                            ring.add(lastPoint);
+                        }
+
+
+                    }
+                    if (ring.size() > 2){
+                        allRings.add(ring);
+                    }
+                } catch (Exception e) {
+                    logger.debug("geomType:"+geomType+"  numRIngs:"+numRings+" numPoints:"+numPoints, e);
+                }
+
+            }
+        }
+
+        return allRings;
     }
     private ArrayList<SimplePoint> getAndQuantize(IPointCollection4 ptCollection) throws IOException{
         ArrayList<SimplePoint> retList = new ArrayList<SimplePoint>();

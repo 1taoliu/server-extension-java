@@ -29,6 +29,8 @@ public class QuantizationQueryOperationInput extends QueryMapServiceLayerOperati
 
     private QuantizationParameters quantizationParameters;
     private String resultType;
+    private Boolean returnCentroid = true;
+    private Boolean returnExceededLimitFeatures = true;
     /*
     private Extent bbox;
     private Double mapUnitsPerPixel;
@@ -37,6 +39,21 @@ public class QuantizationQueryOperationInput extends QueryMapServiceLayerOperati
     */
 
     public QuantizationQueryOperationInput() {
+    }
+    public void setReturnCentroid(Boolean returnCentroid){
+        this.returnCentroid = returnCentroid;
+    }
+
+    public Boolean getReturnCentroid(){
+        return this.returnCentroid;
+    }
+
+    public void setReturnExceededLimitFeatures(Boolean returnExceededLimitFeatures){
+        this.returnExceededLimitFeatures = returnExceededLimitFeatures;
+    }
+
+    public Boolean getReturnExceededLimitFeatures(){
+        return this.returnExceededLimitFeatures;
     }
 
     public void setResultType(String type){
