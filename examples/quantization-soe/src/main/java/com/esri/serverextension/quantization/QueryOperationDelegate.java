@@ -86,18 +86,37 @@ public class QueryOperationDelegate {
             IFeatureClass featureClass = MapServerUtilities.getPolygonFeatureClassByLayerID(layerId, serverContext);
             IQueryFilter queryFilter = getQueryFilter(quantizationInput, featureClass.getShapeFieldName());
 
-        QuantizationParameters params =  quantizationInput.getQuantizationParameters();
-        logger.debug("Quantization Parameters:" + params);
-        if (params != null){
-            logger.debug("Mode:"+params.getMode());
-            logger.debug("Origin Position:"+params.getOriginPosition());
-            logger.debug("Tolerance:"+params.getTolerance());
-            logger.debug("Extent:"+params.getExtent());
-        }
+            if (quantizationInput.getReturnExceededLimitFeatures() == false){
+                int featureCount = featureClass.featureCount(queryFilter);
+                int maxRecordCount = MapServerUtilities.getMaxRecordCount(serverContext);
+                if (featureCount > maxRecordCount){
+                    /*
+                    {"objectIdFieldName":"OBJECTID","globalIdFieldName":"",
+                    "geometryProperties":{"shapeAreaFieldName":"Shape__Area",
+                    "shapeLengthFieldName":"Shape__Length","units":"esriMeters"},
+                    "exceededTransferLimit":true,"features":[]}
+                     */
+                    JSONObject retResource = new JSONObject();
+                    retResource.put("objectIdFieldName", featureClass.getOIDFieldName());
+                    retResource.put("exceededTransferLimit", true);
+                    retResource.put("features", new JSONArray());
+                    byte[] data = retResource.toString().getBytes("utf-8");
+                    return new RestResponse(null, data);
+                }
+            }
+
+            QuantizationParameters params =  quantizationInput.getQuantizationParameters();
+            logger.debug("Quantization Parameters:" + params);
+            if (params != null){
+                logger.debug("Mode:"+params.getMode());
+                logger.debug("Origin Position:"+params.getOriginPosition());
+                logger.debug("Tolerance:"+params.getTolerance());
+                logger.debug("Extent:"+params.getExtent());
+            }
 
 
 
-        QuantizationCallbackHandler quantizationCallbackHandler = new QuantizationCallbackHandler(quantizationInput, featureClass.getShapeFieldName());
+            QuantizationCallbackHandler quantizationCallbackHandler = new QuantizationCallbackHandler(quantizationInput, featureClass.getShapeFieldName());
             GeodatabaseTemplate geodatabaseTemplate = new GeodatabaseTemplate();
             geodatabaseTemplate.query(featureClass, queryFilter, quantizationCallbackHandler);
 
@@ -138,7 +157,7 @@ public class QueryOperationDelegate {
             IJSONObject jsonObject = new com.esri.arcgis.system.JSONObject();
             IJSONConverterGeometry converterGeometry = new JSONConverterGeometry();
             converterGeometry.queryJSONSpatialReference(spRef,
-                jsonObject);
+                    jsonObject);
             String json = jsonObject.toJSONString(null);
             JSONObject jsonSpatialReference = new JSONObject(json);
 

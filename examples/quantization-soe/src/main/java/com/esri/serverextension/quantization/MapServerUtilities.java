@@ -96,6 +96,15 @@ public class MapServerUtilities {
                     "Failed to get point feature class from map server object.");
         }
     }
+    public static final int getMaxRecordCount(ServerObjectExtensionContext serverContext){
+        try {
+            IMapServerInit mapServer = (IMapServerInit) serverContext.getServerObject();
+            return mapServer.getMaxRecordCount();
+        } catch (IOException e) {
+            throw new ArcObjectsInteropException(
+                    "Failed to get max record count from map server object.");
+        }
+    }
 
     public static final ISpatialReference getMapSpatialReference(ServerObjectExtensionContext serverContext) {
         try {
