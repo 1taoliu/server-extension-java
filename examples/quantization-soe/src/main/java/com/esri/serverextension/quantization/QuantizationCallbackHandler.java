@@ -165,7 +165,7 @@ public class QuantizationCallbackHandler implements GeodatabaseObjectCallbackHan
     "extent":{"xmin":-12523442.714242995,"ymin":5009377.085698988,"xmax":-11271098.442818994,"ymax":6261721.357122989,
     "spatialReference":{"latestWkid":3857,"wkid":102100}}}
      */
-        long numPoints = 0;
+        //long numPoints = 0;
         JSONObject tally = new JSONObject();
 
         JSONArray jsonRingsArray = new JSONArray();
@@ -208,8 +208,10 @@ public class QuantizationCallbackHandler implements GeodatabaseObjectCallbackHan
             for(ArrayList<SimplePoint> ring:polygon){
 
                     JSONArray jsonRingArray = new JSONArray();
-                    SimplePoint lastPoint = null;
-                    for (SimplePoint pt:ring){
+                    SimplePoint lastPoint = null, firstPoint=null;
+                    int numPoints = ring.size();
+                    for (int i=numPoints-1;i>=0;i--){
+                        SimplePoint pt = ring.get(i);
                         JSONArray jsonPoint = new JSONArray();
                         if (lastPoint != null){
                             jsonPoint.put(pt.x-lastPoint.x);
@@ -217,10 +219,15 @@ public class QuantizationCallbackHandler implements GeodatabaseObjectCallbackHan
                         }else {
                             jsonPoint.put(pt.x);
                             jsonPoint.put(pt.y);
+                            firstPoint = pt;
                         }
                         lastPoint = pt;
                         jsonRingArray.put(jsonPoint);
                     }
+                    JSONArray jsonPoint = new JSONArray();
+                    jsonPoint.put(firstPoint.x-lastPoint.x);
+                    jsonPoint.put(firstPoint.y-lastPoint.y);
+
                     jsonRingsArray.put(jsonRingArray);
             }
 
@@ -274,6 +281,7 @@ public class QuantizationCallbackHandler implements GeodatabaseObjectCallbackHan
                 int numPoints = buf.getInt();
                 try {
                     SimplePoint lastPoint = null;
+                    SimplePoint priorPoint = null;
                     for (int j=0;j<numPoints;j++){
                         double x =buf.getDouble();
 
@@ -281,11 +289,38 @@ public class QuantizationCallbackHandler implements GeodatabaseObjectCallbackHan
                         long xx = snapX(x);
                         long yy = snapY(y);
 
-                        if (lastPoint == null || !lastPoint.equals(xx,yy)){
+                        boolean bAddPoint;
+                        if (lastPoint == null){
+                            bAddPoint = true;
+                        }else if (lastPoint.equals(xx,yy)){// eliminate coincident points
+                            bAddPoint = false;
+                        }else if (priorPoint==null){
+                            bAddPoint = true;
+                        }else{
+
+
+
+                            if (priorPoint.equals(xx,yy)){ //eliminate spurs of 1 point
+                                bAddPoint = false;
+                                ring.remove(ring.size()-1);
+                                lastPoint = priorPoint;
+                                priorPoint = null;
+                            }else{
+                                bAddPoint = true;
+
+                                if (priorPoint.hasZeroOffsetAndIsAhead(lastPoint, xx, yy)){
+                                    ring.remove(ring.size()-1);
+                                    lastPoint = priorPoint;
+                                }
+
+                            }
+                        }
+
+                        if (bAddPoint){
+                            priorPoint = lastPoint;
                             lastPoint = new SimplePoint(xx,yy);
                             ring.add(lastPoint);
                         }
-
 
                     }
                     if (ring.size() > 2){
