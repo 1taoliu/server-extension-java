@@ -227,8 +227,7 @@ public abstract class AbstractRestServerObjectExtension implements
                 request.setAttribute(entry.getKey(), entry.getValue());
             }
 
-            logger.error("==>Request: {}", request);
-            logger.error("resourceName="+resourceName+"  operationName="+operationName);
+            logger.debug("Request: {}", request);
 
             String path = new UriPath(resourceName, operationName).getPath();
 
