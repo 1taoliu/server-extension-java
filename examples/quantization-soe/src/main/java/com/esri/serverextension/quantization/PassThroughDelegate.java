@@ -32,7 +32,7 @@ public class PassThroughDelegate {
     public RestResponse query(
             RestRequest request,
             RestDelegate handler) throws IOException {
-        logger.error("Passing through request ...!!!");
+        logger.debug("Passing through request ...!!!");
 
         return handler.process(request, null);
     }

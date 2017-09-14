@@ -38,7 +38,7 @@ public class LayerInfoDelegate {
     public RestResponse query(
             RestRequest request,
             RestDelegate handler) throws IOException {
-        logger.error("LayerInfo Delegate ...!!!");
+        logger.debug("LayerInfo Delegate ...!!!");
 
         RestResponse response =  handler.process(request, null);
 
