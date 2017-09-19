@@ -140,8 +140,13 @@ public class QuantizationCallbackHandler implements GeodatabaseObjectCallbackHan
 
             JSONObject jsonAttributes = new JSONObject();
             for (Map.Entry<String, Object> entry:attributes.entrySet()){
-                if (!entry.getKey().equalsIgnoreCase(shapeFieldName)){
-                    jsonAttributes.put(entry.getKey(), entry.getValue().toString());
+
+                if (!entry.getKey().equalsIgnoreCase(shapeFieldName)) {
+                    if (entry.getValue() == null) {
+                        jsonAttributes.put(entry.getKey(), "null");
+                    } else {
+                        jsonAttributes.put(entry.getKey(), entry.getValue().toString());
+                    }
                 }
             }
             featureObject.put("attributes", jsonAttributes);
