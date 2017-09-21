@@ -42,8 +42,12 @@ public class ClusterAssemblerIT extends AbstractArcObjectsIT {
     private IWorkspace workspace;
 
     @Test
-    public void testClusterAssembler(String where) throws IOException {
-        System.out.println("1. Setting up query filter.");
+    public void testAssembleClusters() throws IOException {
+        assembleClusters("Issue_Date >= date '2017-01-01 00:00:00'");
+    }
+
+    public void assembleClusters(String where) throws IOException {
+        System.out.println("Step 1: Setting up query filter.");
         IFeatureClass featureClass = ((IFeatureWorkspace)workspace).openFeatureClass("Permit_Features");
         SpatialFilter spatialFilter = new SpatialFilter();
         spatialFilter.setSubFields("Valuation,Shape");
@@ -59,13 +63,13 @@ public class ClusterAssemblerIT extends AbstractArcObjectsIT {
         spatialFilter.setWhereClause(where);
         spatialFilter.setOutputSpatialReferenceByRef("Shape", ArcObjectsUtilities.createSpatialReference(102100));
 
-        System.out.println("2. Executing query.");
+        System.out.println("Step 2: Executing query.");
         GeodatabaseTemplate geodatabaseTemplate = new GeodatabaseTemplate();
         ClusterAssemblerCallbackHandler clusterAssemblerCallbackHandler = new ClusterAssemblerCallbackHandler("Valuation");
         geodatabaseTemplate.query(featureClass, spatialFilter, clusterAssemblerCallbackHandler);
         System.out.println(String.format("# of input features: %1$d", clusterAssemblerCallbackHandler.getFeatureCount()));
 
-        System.out.println("3. Building clusters.");
+        System.out.println("Step 3: Building clusters.");
         ClusterExtent clusterExtent = new ClusterExtent(-13244092.36900171,
                 4000883.3498998554,
                 -13118812.079642477,
@@ -91,7 +95,7 @@ public class ClusterAssemblerIT extends AbstractArcObjectsIT {
         IWorkspace workspace = fileGDBWorkspaceFactoryBean.getObject();
         ClusterAssemblerIT clusterAssemblerIT = new ClusterAssemblerIT();
         clusterAssemblerIT.workspace = workspace;
-        clusterAssemblerIT.testClusterAssembler("Issue_Date >= date '2017-01-01 00:00:00'");
+        clusterAssemblerIT.assembleClusters("Issue_Date >= date '2016-01-01 00:00:00'");
         ArcObjectsInitializer.getInstance().shutdown();
         System.out.println(String.format("Time elapsed: %1$f", timer.stop().elapsedTimeSeconds()));
     }

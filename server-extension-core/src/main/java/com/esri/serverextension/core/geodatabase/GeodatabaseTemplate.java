@@ -14,17 +14,16 @@
 
 package com.esri.serverextension.core.geodatabase;
 
-import com.esri.arcgis.geodatabase.*;
-import com.esri.arcgis.interop.AutomationException;
+import com.esri.arcgis.geodatabase.IFeatureClass;
+import com.esri.arcgis.geodatabase.IFeatureCursor;
+import com.esri.arcgis.geodatabase.IQueryFilter;
 import com.esri.arcgis.system.Cleaner;
 import com.esri.serverextension.core.util.StopWatch;
 import com.esri.serverextension.core.util.UncheckedIOException;
-import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
-import java.util.ArrayList;
 import java.util.List;
 
 public class GeodatabaseTemplate {

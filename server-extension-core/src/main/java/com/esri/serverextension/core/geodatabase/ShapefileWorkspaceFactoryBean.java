@@ -14,7 +14,7 @@
 
 package com.esri.serverextension.core.geodatabase;
 
-import com.esri.arcgis.datasourcesGDB.FileGDBWorkspaceFactory;
+import com.esri.arcgis.datasourcesfile.ShapefileWorkspaceFactory;
 import com.esri.arcgis.geodatabase.IWorkspace;
 import com.esri.arcgis.system.Cleaner;
 import com.esri.arcgis.system.IPropertySet;
@@ -22,13 +22,13 @@ import com.esri.arcgis.system.PropertySet;
 import org.springframework.beans.factory.DisposableBean;
 import org.springframework.beans.factory.SmartFactoryBean;
 
-public class FileGDBWorkspaceFactoryBean implements
+public class ShapefileWorkspaceFactoryBean implements
 		SmartFactoryBean<IWorkspace>, DisposableBean {
 
 	private String database;
 	private IWorkspace workspace;
 
-	public FileGDBWorkspaceFactoryBean() {
+	public ShapefileWorkspaceFactoryBean() {
 	}
 
 	public String getDatabase() {
@@ -46,13 +46,13 @@ public class FileGDBWorkspaceFactoryBean implements
 			if (database != null) {
 				propertySet.setProperty("DATABASE", database);
 			}
-			FileGDBWorkspaceFactory fileGDBWorkspaceFactory = new FileGDBWorkspaceFactory();
-			workspace = fileGDBWorkspaceFactory.open(propertySet, 0);
+			ShapefileWorkspaceFactory shapefileWorkspaceFactory = new ShapefileWorkspaceFactory();
+			workspace = shapefileWorkspaceFactory.open(propertySet, 0);
 
 			// FileGDBWorkspaceFactory is a singleton.
 			// It is a good practice to release the singletons
 			// using com.esri.system.Cleaner.release()
-			Cleaner.release(fileGDBWorkspaceFactory);
+			Cleaner.release(shapefileWorkspaceFactory);
 		}
 		return workspace;
 	}
@@ -87,6 +87,6 @@ public class FileGDBWorkspaceFactoryBean implements
 
 	@Override
 	public String toString() {
-		return "FileGDBWorkspaceFactoryBean [database=" + database + "]";
+		return "ShapefileWorkspaceFactoryBean [database=" + database + "]";
 	}
 }

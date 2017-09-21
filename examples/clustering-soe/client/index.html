@@ -147,7 +147,7 @@
             on(dom.byId("whereW"), "change",
                 function (e) {
                     console.log(e);
-                    clusterLayer.where = e.currentTarget.value;
+                    clusterLayer.where = e.currentTarget.options[e.currentTarget.selectedIndex].value;
                     clusterLayer.refreshLayer();
                 }
             );
@@ -192,7 +192,12 @@
 
     <label for="whereW">Where:</label>
 
-    <input type="text" id="whereW" name="whereW" size="50" value="Issue_Date >= date '2017-01-01 00:00:00'"/>
+    <select id="whereW" name="whereW">
+        <option value="1 = 1">All (565,325)</option>
+        <option value="Issue_Date >= date '2017-01-01 00:00:00'">Issued since 1/1/2017 (166,201)</option>
+        <option value="Issue_Date >= date '2016-07-01 00:00:00'">Issued since 7/1/2016 (92,946)</option>
+        <option value="Issue_Date >= date '2017-01-01 00:00:00'" selected="selected">Issued since 1/1/2017 (18,078)</option>
+    </select>
 
 </div>
 

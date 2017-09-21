@@ -18,7 +18,7 @@
     <parent>
 		<groupId>com.esri.serverextensions</groupId>
         <artifactId>server-extension-java</artifactId>        
-        <version>0.2.0</version>
+        <version>0.3.0</version>
     </parent>
     <modelVersion>4.0.0</modelVersion>
     <artifactId>server-extension-core</artifactId>
@@ -82,19 +82,11 @@
             <version>2.25.1</version>
         </dependency>
         <dependency>
-            <groupId>com.esri</groupId>
-            <artifactId>arcobjects</artifactId>
-            <version>10.5.1</version>
-            <scope>provided</scope>
-        </dependency>
-<!--
-        <dependency>
             <groupId>com.esri.arcgis</groupId>
             <artifactId>arcobjects</artifactId>
             <version>${com.esri.arcgis.version}</version>
             <scope>system</scope>
             <systemPath>${env.AGSSERVER}\framework\lib\arcobjects.jar</systemPath>
         </dependency>
-        -->
     </dependencies>
 </project>

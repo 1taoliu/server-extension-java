@@ -14,19 +14,7 @@
 
 package com.esri.serverextension.core.geodatabase;
 
-import com.esri.arcgis.interop.AutomationException;
-import org.springframework.dao.UncategorizedDataAccessException;
+public class GeodatabaseQueryFilter {
 
-public class GeodatabaseSystemException extends UncategorizedDataAccessException {
-
-	private static final long serialVersionUID = 1L;
-
-	public GeodatabaseSystemException(AutomationException cause) {
-		this(null, cause);		
-	}
-	
-	public GeodatabaseSystemException(String msg, AutomationException cause) {
-		super(msg, cause);		
-	}
 
 }

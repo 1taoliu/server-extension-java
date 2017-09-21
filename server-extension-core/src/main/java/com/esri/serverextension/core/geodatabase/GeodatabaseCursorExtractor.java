@@ -14,11 +14,10 @@
 
 package com.esri.serverextension.core.geodatabase;
 
-import java.io.IOException;
-
 import com.esri.arcgis.geodatabase.ICursor;
 import com.esri.arcgis.geodatabase.IFeatureCursor;
-import com.esri.arcgis.geodatabase.IField;
+
+import java.io.IOException;
 
 public interface GeodatabaseCursorExtractor<T> {
 

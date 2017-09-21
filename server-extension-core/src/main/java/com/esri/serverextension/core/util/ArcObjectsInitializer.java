@@ -15,10 +15,7 @@
 package com.esri.serverextension.core.util;
 
 import com.esri.arcgis.interop.AutomationException;
-import com.esri.arcgis.system.AoInitialize;
-import com.esri.arcgis.system.EngineInitializer;
-import com.esri.arcgis.system.esriLicenseProductCode;
-import com.esri.arcgis.system.esriLicenseStatus;
+import com.esri.arcgis.system.*;
 
 import java.io.IOException;
 import java.net.UnknownHostException;
@@ -40,7 +37,7 @@ public class ArcObjectsInitializer {
     }
 
     public void init() throws UnknownHostException, IOException {
-        EngineInitializer.initializeEngine();
+        EngineInitializer.initializeServer(esriProductCode.esriProductCodeServerStandardEdition);
         this.aoInit = new AoInitialize();
 
         if (aoInit

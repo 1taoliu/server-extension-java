@@ -15,11 +15,11 @@
 package com.esri.serverextension.core.server.internal;
 
 import com.esri.arcgis.server.IServerObject;
+import com.esri.arcgis.system.IServerEnvironment;
 import com.esri.serverextension.core.security.SecurityContext;
 import com.esri.serverextension.core.server.RestDelegate;
 import com.esri.serverextension.core.server.RestRequest;
 import com.esri.serverextension.core.server.ServerObjectExtensionContext;
-import com.esri.arcgis.system.IServerEnvironment;
 import org.springframework.core.MethodParameter;
 
 import java.security.Principal;

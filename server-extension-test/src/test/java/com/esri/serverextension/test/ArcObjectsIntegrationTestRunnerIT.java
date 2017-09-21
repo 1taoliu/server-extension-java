@@ -12,21 +12,23 @@
  * limitations under the License.​
  */
 
-package com.esri.serverextension.core.geodatabase;
+package com.esri.serverextension.test;
 
-import com.esri.arcgis.interop.AutomationException;
-import org.springframework.dao.UncategorizedDataAccessException;
+import com.esri.arcgis.geometry.IPoint;
+import com.esri.arcgis.geometry.Point;
+import org.junit.Test;
+import org.junit.runner.RunWith;
 
-public class GeodatabaseSystemException extends UncategorizedDataAccessException {
+import java.io.IOException;
 
-	private static final long serialVersionUID = 1L;
+@RunWith(ArcObjectsIntegrationTestRunner.class)
+public class ArcObjectsTestRunnerIT {
 
-	public GeodatabaseSystemException(AutomationException cause) {
-		this(null, cause);		
-	}
-	
-	public GeodatabaseSystemException(String msg, AutomationException cause) {
-		super(msg, cause);		
-	}
+    @Test
+    public void runTest() throws IOException {
+        IPoint point = new Point();
+        point.setX(1.0);
+        point.setY(2.0);
+    }
 
 }

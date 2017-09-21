@@ -15,8 +15,8 @@
 package com.esri.serverextension.core.rest.json;
 
 import com.esri.arcgis.geometry.*;
-import com.esri.serverextension.core.geometry.SpatialReferenceFactory;
 import com.esri.arcgis.system.*;
+import com.esri.serverextension.core.geometry.SpatialReferenceFactory;
 import org.apache.commons.lang3.StringUtils;
 
 import java.io.IOException;

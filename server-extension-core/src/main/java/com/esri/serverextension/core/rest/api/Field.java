@@ -14,12 +14,11 @@
 
 package com.esri.serverextension.core.rest.api;
 
-import java.io.Serializable;
-
-import javax.xml.bind.annotation.XmlRootElement;
-
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import org.apache.commons.lang3.builder.ToStringBuilder;
+
+import javax.xml.bind.annotation.XmlRootElement;
+import java.io.Serializable;
 
 @XmlRootElement
 @JsonIgnoreProperties(ignoreUnknown = true)

@@ -34,6 +34,9 @@ public class UriPath {
     public String getPath() {
         // build the URI path to the requested resource and operation
         StringBuilder pathBuilder = new StringBuilder();
+        if (StringUtils.isEmpty(resource) || resource.charAt(0) != '/') {
+            pathBuilder.append('/');
+        }
         if (!StringUtils.isEmpty(resource)) {
             if (resource.charAt(0) != '/'){
                 pathBuilder.append('/');

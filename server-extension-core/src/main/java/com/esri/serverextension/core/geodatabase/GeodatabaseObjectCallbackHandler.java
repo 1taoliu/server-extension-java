@@ -15,7 +15,6 @@
 package com.esri.serverextension.core.geodatabase;
 
 import com.esri.arcgis.geodatabase.IFeature;
-import com.esri.arcgis.geodatabase.IField;
 import com.esri.arcgis.geodatabase.IRow;
 
 import java.io.IOException;
