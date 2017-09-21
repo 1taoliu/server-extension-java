@@ -17,7 +17,7 @@
     <modelVersion>4.0.0</modelVersion>
     <groupId>com.esri.serverextensions</groupId>
     <artifactId>server-extension-java</artifactId>
-    <version>0.2.0</version>
+    <version>0.3.0</version>
     <name>server-extension-java</name>
     <description>A template project for creating Server Object Extensions and Server Object Interceptors</description>
     <packaging>pom</packaging>
@@ -27,11 +27,13 @@
         <module>examples/attribute-security-filter-soi</module>
         <module>examples/clustering-soe</module>
         <module>examples/quantization-soe</module>
+        <module>server-extension-test</module>
     </modules>
     <properties>
         <jdk.version>1.8</jdk.version>
-        <com.esri.arcgis.version>10.5.0.6491</com.esri.arcgis.version>
+        <com.esri.arcgis.version>10.5.1</com.esri.arcgis.version>
         <org.springframework.version>4.3.6.RELEASE</org.springframework.version>
+        <junit.version>4.12</junit.version>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
         <JAVA_HOME>${env.JAVA_HOME}</JAVA_HOME>
@@ -55,7 +57,7 @@
         <dependency>
             <groupId>junit</groupId>
             <artifactId>junit</artifactId>
-            <version>4.12</version>
+            <version>${junit.version}</version>
             <scope>test</scope>
         </dependency>
         <dependency>
@@ -135,11 +137,11 @@
                         ArcObject's classes. It requires a properly activated installation of ArcGIS
                         for Sever. -->
                     <argLine>-Djava.library.path="${env.AGSSERVER}/bin"</argLine>
-                    <forkCount>1</forkCount>
+                    <forkCount>0</forkCount>
                     <reuseForks>true</reuseForks>
-                    <excludes>
-                        <exclude>**/*IT.java</exclude>
-                    </excludes>
+                    <!--<excludes>-->
+                        <!--<exclude>**/*IT.java</exclude>-->
+                    <!--</excludes>-->
                 </configuration>
             </plugin>
         </plugins>

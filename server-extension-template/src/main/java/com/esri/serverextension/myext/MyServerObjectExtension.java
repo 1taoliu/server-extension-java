@@ -20,8 +20,8 @@ import com.esri.arcgis.interop.extn.ServerObjectExtProperties;
 import com.esri.arcgis.server.json.JSONArray;
 import com.esri.arcgis.server.json.JSONException;
 import com.esri.arcgis.server.json.JSONObject;
-import com.esri.serverextension.core.server.AbstractRestServerObjectExtension;
 import com.esri.arcgis.system.ServerUtilities;
+import com.esri.serverextension.core.server.AbstractRestServerObjectExtension;
 import org.springframework.context.annotation.AnnotationConfigApplicationContext;
 
 import java.io.IOException;

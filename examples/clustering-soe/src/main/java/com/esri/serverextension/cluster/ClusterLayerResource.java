@@ -22,8 +22,8 @@ import com.esri.arcgis.geometry.Point;
 import com.esri.arcgis.interop.Cleaner;
 import com.esri.arcgis.server.json.JSONObject;
 import com.esri.serverextension.core.geodatabase.GeodatabaseTemplate;
-import com.esri.serverextension.core.rest.api.*;
 import com.esri.serverextension.core.rest.api.Feature;
+import com.esri.serverextension.core.rest.api.*;
 import com.esri.serverextension.core.rest.api.Field;
 import com.esri.serverextension.core.rest.api.FieldType;
 import com.esri.serverextension.core.server.ServerObjectExtensionContext;
@@ -46,7 +46,8 @@ import java.util.Map;
 public class ClusterLayerResource {
 
     @RequestMapping("/layers/{layerId}")
-    public JSONObject getLayerResource(@PathVariable("layerId") int layerId, ServerObjectExtensionContext serverContext) {
+    public JSONObject getLayerResource(@PathVariable("layerId") int layerId,
+                                       ServerObjectExtensionContext serverContext) {
         IMapLayerInfo layerInfo = MapServerUtilities.getPointFeatureLayerByID(layerId, serverContext);
         JSONObject layerObject = new JSONObject();
         try {
@@ -61,7 +62,9 @@ public class ClusterLayerResource {
     }
 
     @RequestMapping("/layers/{layerId}/query")
-    public FeatureSet query(@PathVariable("layerId") int layerId, @BeanParam ClusterQueryOperationInput input, ServerObjectExtensionContext serverContext) {
+    public FeatureSet query(@PathVariable("layerId") int layerId,
+                            @BeanParam ClusterQueryOperationInput input,
+                            ServerObjectExtensionContext serverContext) {
         try {
             IFeatureClass featureClass = MapServerUtilities.getPointFeatureClassByLayerID(layerId, serverContext);
             IQueryFilter queryFilter = getQueryFilter(input, featureClass.getShapeFieldName());
@@ -117,7 +120,8 @@ public class ClusterLayerResource {
         }
     }
 
-    private IQueryFilter getQueryFilter(ClusterQueryOperationInput input, String shapeFieldName) {
+    private IQueryFilter getQueryFilter(ClusterQueryOperationInput input,
+                                        String shapeFieldName) {
         try {
             IQueryFilter2 queryFilter = null;
             if (input.getGeometry() != null) {
@@ -159,7 +163,8 @@ public class ClusterLayerResource {
         }
     }
 
-    private ISpatialReference getOutSpatialReference(ClusterQueryOperationInput input, ServerObjectExtensionContext serverContext) {
+    private ISpatialReference getOutSpatialReference(ClusterQueryOperationInput input,
+                                                     ServerObjectExtensionContext serverContext) {
         if (input.getOutSR() != null) {
             return input.getOutSR();
         }

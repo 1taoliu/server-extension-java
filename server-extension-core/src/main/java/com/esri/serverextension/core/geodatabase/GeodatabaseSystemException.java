@@ -14,9 +14,8 @@
 
 package com.esri.serverextension.core.geodatabase;
 
-import org.springframework.dao.UncategorizedDataAccessException;
-
 import com.esri.arcgis.interop.AutomationException;
+import org.springframework.dao.UncategorizedDataAccessException;
 
 public class GeodatabaseSystemException extends UncategorizedDataAccessException {
 

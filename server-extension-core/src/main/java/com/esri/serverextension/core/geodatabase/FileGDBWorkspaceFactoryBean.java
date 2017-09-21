@@ -14,14 +14,13 @@
 
 package com.esri.serverextension.core.geodatabase;
 
-import org.springframework.beans.factory.DisposableBean;
-import org.springframework.beans.factory.SmartFactoryBean;
-
 import com.esri.arcgis.datasourcesGDB.FileGDBWorkspaceFactory;
 import com.esri.arcgis.geodatabase.IWorkspace;
 import com.esri.arcgis.system.Cleaner;
 import com.esri.arcgis.system.IPropertySet;
 import com.esri.arcgis.system.PropertySet;
+import org.springframework.beans.factory.DisposableBean;
+import org.springframework.beans.factory.SmartFactoryBean;
 
 public class FileGDBWorkspaceFactoryBean implements
 		SmartFactoryBean<IWorkspace>, DisposableBean {

@@ -17,11 +17,9 @@ package com.esri.serverextension.core.server.internal;
 import com.esri.arcgis.geodatabase.IRecordSet;
 import com.esri.arcgis.server.json.JSONArray;
 import com.esri.arcgis.server.json.JSONObject;
+import com.esri.serverextension.core.rest.json.JSONConverter;
 import com.esri.serverextension.core.server.RestRequest;
 import com.esri.serverextension.core.server.RestResponse;
-import com.esri.serverextension.core.rest.json.JSONConverter;
-import com.esri.arcgis.system.IJSONArray;
-import com.esri.arcgis.system.IJSONObject;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.springframework.core.MethodParameter;
 

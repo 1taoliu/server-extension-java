@@ -15,60 +15,99 @@
 package com.esri.serverextension.quantization;
 
 import com.esri.arcgis.geodatabase.*;
-import com.esri.arcgis.geometry.IEnvelope;
-import com.esri.serverextension.core.geodatabase.FileGDBWorkspaceFactoryBean;
+import com.esri.arcgis.geometry.*;
+import com.esri.arcgis.system._WKSPoint;
+import com.esri.serverextension.core.geodatabase.GeodatabaseFieldMap;
+import com.esri.serverextension.core.geodatabase.GeodatabaseObjectCallbackHandler;
 import com.esri.serverextension.core.geodatabase.GeodatabaseTemplate;
-import com.esri.serverextension.core.rest.json.JSONGeometryMapper;
+import com.esri.serverextension.core.geodatabase.ShapefileWorkspaceFactoryBean;
 import com.esri.serverextension.core.util.ArcObjectsInitializer;
 import com.esri.serverextension.core.util.ArcObjectsUtilities;
 import com.esri.serverextension.core.util.StopWatch;
-import com.esri.serverextension.test.AbstractArcObjectsIT;
-import net.jcip.annotations.NotThreadSafe;
-import org.junit.Test;
-import org.junit.runner.RunWith;
-import org.springframework.test.context.ContextConfiguration;
-import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
+import org.locationtech.jts.geom.Geometry;
+import org.locationtech.jts.io.ParseException;
+import org.locationtech.jts.io.WKBReader;
 
-import javax.inject.Inject;
 import java.io.IOException;
+import java.util.Arrays;
 
-@RunWith(SpringJUnit4ClassRunner.class)
-@NotThreadSafe
-@ContextConfiguration(locations = {"/spring/config/applicationContext-file-gdb-workspace-test.xml"})
-public class QuantizationAssemblerIT extends AbstractArcObjectsIT {
+public class QuantizationAssemblerIT {
 
-    @Inject
-    private IWorkspace workspace;
+    public static void main(String[] args) throws Exception {
+        StopWatch timer = StopWatch.createAndStart();
+        System.out.println("1. Starting ArcObjects runtime.");
+        ArcObjectsInitializer.getInstance().init();
 
-    @Test
-    public void testQuantizationAssembler(String where) throws IOException {
-        /*
-        System.out.println("1. Setting up query filter.");
-        IFeatureClass featureClass = ((IFeatureWorkspace)workspace).openFeatureClass("Permit_Features");
+        System.out.println("2. Opening shapefile.");
+        ShapefileWorkspaceFactoryBean shapefileWorkspaceFactoryBean = new ShapefileWorkspaceFactoryBean();
+        shapefileWorkspaceFactoryBean.setDatabase("D:\\Development\\Projects\\sever-extension-java\\examples\\quantization-soe\\data\\Quantization");
+        IWorkspace workspace = shapefileWorkspaceFactoryBean.getObject();
+        IFeatureClass featureClass = ((IFeatureWorkspace) workspace).openFeatureClass("tl_2016_06_bg");
+
+        System.out.println("3. Setting up query filter.");
         SpatialFilter spatialFilter = new SpatialFilter();
-        spatialFilter.setSubFields("Valuation,Shape");
+        spatialFilter.setSubFields("*");
         spatialFilter.setGeometryField("Shape");
-        spatialFilter.setSpatialRel(esriSpatialRelEnum.esriSpatialRelIntersects);
-        JSONGeometryMapper geometryMapper = new JSONGeometryMapper();
-        IEnvelope envelope = geometryMapper.readEnvelope("{\"xmin\":-13244092.36900171," +
-                "\"ymin\":4000883.3498998554," +
-                "\"xmax\":-13118812.079642477," +
-                "\"ymax\":4061574.350358204," +
-                "\"spatialReference\":{\"wkid\":102100}}");
-        spatialFilter.setGeometryByRef(envelope);
-        spatialFilter.setWhereClause(where);
+        spatialFilter.setWhereClause("1=1");
         spatialFilter.setOutputSpatialReferenceByRef("Shape", ArcObjectsUtilities.createSpatialReference(102100));
 
-        System.out.println("2. Executing query.");
+        System.out.println("4. Executing query.");
         GeodatabaseTemplate geodatabaseTemplate = new GeodatabaseTemplate();
-        QuantizationCallbackHandler quantizationAssemblerCallbackHandler = new QuantizationCallbackHandler("Valuation");
-        geodatabaseTemplate.query(featureClass, spatialFilter, quantizationAssemblerCallbackHandler);
-        System.out.println(String.format("# of input features: %1$d", quantizationAssemblerCallbackHandler.getFeatureCount()));
+        final IGeometryBridge2 geometryBridge = new GeometryEnvironment();
+        final IGeometryFactory2  geometryFactory = (IGeometryFactory2)geometryBridge;
+        final WKBReader wkbReader = new WKBReader();
+        final int[] featureCount = new int[1];
+        featureCount[0] = 0;
+        final int[] ringCount = new int[1];
+        ringCount[0] = 0;
+        final int[] vertexCount = new int[1];
+        vertexCount[0] = 0;
+        geodatabaseTemplate.query(featureClass, spatialFilter, new GeodatabaseObjectCallbackHandler() {
+            @Override
+            public void setGeodatabaseFieldMap(GeodatabaseFieldMap fieldMap) throws IOException {
 
-        System.out.println("3. Building clusters.");
-      */
+            }
 
+            @Override
+            public void processRow(IRow row) throws IOException {
+
+            }
+
+            @Override
+            public void processFeature(IFeature feature) throws IOException {
+                featureCount[0] = featureCount[0] + 1;
+                IPolygon polygon = (IPolygon) feature.getShape();
+//                IGeometryCollection geometryCollection = (IGeometryCollection) polygon;
+//                int ringCount = geometryCollection.getGeometryCount();
+//                for (int i = 0; i < ringCount; i++) {
+//                    ringCount[0] = ringCount[0] + 1;
+//                    IPointCollection4 ring = (IPointCollection4) geometryCollection.getGeometry(i);
+//                    int pointCount = ring.getPointCount();
+//                    vertexCount[0] = vertexCount[0] + pointCount;
+//                    _WKSPoint[][] points = new _WKSPoint[1][ring.getPointCount()];
+//                    for (int j = 0; j < pointCount; j++) {
+//                        points[0][j] = new _WKSPoint();
+//                    }
+//                    geometryBridge.queryWKSPoints(ring, 0, points);//
+//                    for (_WKSPoint point : points[0]) {
+//                        if (point.x == 0.0d && point.y == 0.0d) {
+//                            System.out.println("Coordinates are zero.");
+//                        }
+//                    }
+//                }
+                byte[] wkb = (byte[])geometryFactory.createWkbVariantFromGeometry(polygon);
+                Geometry geometry = null;
+                try {
+                    geometry = wkbReader.read(wkb);
+                } catch (ParseException e) {
+                    throw new RuntimeException("Cannot read WKB.");
+                }
+            }
+        });
+
+        ArcObjectsInitializer.getInstance().shutdown();
+        System.out.println(String.format("Features fetched: %1$d", featureCount[0]));
+        System.out.println(String.format("Vertices fetched: %1$d", vertexCount[0]));
+        System.out.println(String.format("Time elapsed: %1$f", timer.stop().elapsedTimeSeconds()));
     }
-
-
 }

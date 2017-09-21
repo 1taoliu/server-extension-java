@@ -15,19 +15,15 @@
 package com.esri.serverextension.cluster;
 
 import com.esri.arcgis.geodatabase.IFeature;
-import com.esri.arcgis.geodatabase.IField;
 import com.esri.arcgis.geodatabase.IRow;
 import com.esri.arcgis.geometry.IGeometry;
 import com.esri.arcgis.geometry.IPoint;
 import com.esri.serverextension.core.geodatabase.GeodatabaseFieldMap;
 import com.esri.serverextension.core.geodatabase.GeodatabaseObjectCallbackHandler;
-import com.esri.serverextension.core.geodatabase.GeodatabaseObjectMapper;
-import com.esri.serverextension.core.rest.api.Feature;
 
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.LinkedHashMap;
-import java.util.List;
 import java.util.Map;
 
 public class ClusterAssemblerCallbackHandler implements GeodatabaseObjectCallbackHandler {

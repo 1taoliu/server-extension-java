@@ -14,26 +14,21 @@
 
 package com.esri.serverextension.test;
 
-import com.esri.arcgis.interop.AutomationException;
-import com.esri.serverextension.core.util.ArcObjectsInitializer;
-import org.junit.AfterClass;
-import org.junit.BeforeClass;
+import com.esri.arcgis.geometry.IPoint;
+import com.esri.arcgis.geometry.Point;
+import org.junit.Test;
+import org.junit.runner.RunWith;
 
 import java.io.IOException;
-import java.net.UnknownHostException;
 
-public abstract class AbstractArcObjectsIT {
+@RunWith(ArcObjectsIntegrationTestRunner.class)
+public class ArcObjectsTestRunnerIT {
 
-	public AbstractArcObjectsIT() {
-	}
+    @Test
+    public void runTest() throws IOException {
+        IPoint point = new Point();
+        point.setX(1.0);
+        point.setY(2.0);
+    }
 
-	@BeforeClass
-	public static void init() throws UnknownHostException, IOException {
-		ArcObjectsInitializer.getInstance().init();
-	}
-
-	@AfterClass
-	public static void shutdown() throws AutomationException, IOException {
-		ArcObjectsInitializer.getInstance().shutdown();
-	}
 }

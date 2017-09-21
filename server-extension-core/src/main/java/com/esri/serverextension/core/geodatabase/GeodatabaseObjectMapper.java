@@ -14,12 +14,10 @@
 
 package com.esri.serverextension.core.geodatabase;
 
-import java.io.IOException;
-
 import com.esri.arcgis.geodatabase.IFeature;
-import com.esri.arcgis.geodatabase.IFeatureClass;
-import com.esri.arcgis.geodatabase.IField;
 import com.esri.arcgis.geodatabase.IRow;
+
+import java.io.IOException;
 
 public interface GeodatabaseObjectMapper<T> {
 

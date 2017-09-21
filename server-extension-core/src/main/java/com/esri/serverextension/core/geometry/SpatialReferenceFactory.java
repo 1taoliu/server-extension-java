@@ -17,8 +17,8 @@ import com.esri.arcgis.geometry.ISpatialReference;
 import com.esri.arcgis.geometry.ISpatialReferenceResolution;
 import com.esri.arcgis.geometry.ISpatialReferenceTolerance;
 import com.esri.arcgis.geometry.SpatialReferenceEnvironment;
-import com.esri.serverextension.core.util.ArcObjectsInteropException;
 import com.esri.arcgis.system.Cleaner;
+import com.esri.serverextension.core.util.ArcObjectsInteropException;
 
 import java.io.IOException;
 

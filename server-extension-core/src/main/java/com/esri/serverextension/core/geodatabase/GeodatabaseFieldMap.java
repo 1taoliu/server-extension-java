@@ -14,10 +14,8 @@
 
 package com.esri.serverextension.core.geodatabase;
 
-import com.esri.arcgis.geodatabase.IFeatureClass;
 import com.esri.arcgis.geodatabase.IField;
 import com.esri.arcgis.geodatabase.IFields;
-import com.esri.arcgis.geodatabase.IQueryFilter;
 import com.esri.serverextension.core.util.ArcObjectsInteropException;
 import org.apache.commons.lang3.StringUtils;
 

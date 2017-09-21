@@ -14,7 +14,10 @@
 
 package com.esri.serverextension.core.geodatabase;
 
-import com.esri.arcgis.geodatabase.*;
+import com.esri.arcgis.geodatabase.ICursor;
+import com.esri.arcgis.geodatabase.IFeature;
+import com.esri.arcgis.geodatabase.IFeatureCursor;
+import com.esri.arcgis.geodatabase.IRow;
 import com.esri.arcgis.interop.AutomationException;
 import com.esri.arcgis.system.Cleaner;
 import com.esri.serverextension.core.util.StopWatch;
