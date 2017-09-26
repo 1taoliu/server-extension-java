@@ -12,7 +12,7 @@
  * limitations under the License.​
  */
 
-package com.esri.serverextension.core.util;
+package com.esri.serverextension.log;
 
 import com.esri.arcgis.system.ServerUtilities;
 import org.slf4j.ILoggerFactory;
@@ -30,12 +30,12 @@ public class LogAdaptorFactory implements ILoggerFactory {
         loggerMap = new ConcurrentHashMap<String, Logger>();
     }
 
-    public void setShowShortLogName(boolean showShortLogName) {
-        this.showShortLogName = showShortLogName;
-    }
-
     public boolean isShowShortLogName() {
         return showShortLogName;
+    }
+
+    public void setShowShortLogName(boolean showShortLogName) {
+        this.showShortLogName = showShortLogName;
     }
 
     /**

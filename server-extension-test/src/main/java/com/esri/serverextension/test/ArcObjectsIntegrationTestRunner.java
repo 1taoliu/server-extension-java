@@ -21,14 +21,13 @@ import org.junit.runners.model.InitializationError;
 import org.junit.runners.model.Statement;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.test.context.TestContextManager;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
-public class ArcObjectsTestRunner extends SpringJUnit4ClassRunner {
+public class ArcObjectsIntegrationTestRunner extends BlockJUnit4ClassRunner {
 
-    private final Logger logger = LoggerFactory.getLogger(ArcObjectsTestRunner.class);
+    private final Logger logger = LoggerFactory.getLogger(ArcObjectsIntegrationTestRunner.class);
 
-    public ArcObjectsTestRunner(Class<?> clazz) throws InitializationError {
+    public ArcObjectsIntegrationTestRunner(Class<?> clazz) throws InitializationError {
         super(clazz);
     }
 
@@ -38,7 +37,7 @@ public class ArcObjectsTestRunner extends SpringJUnit4ClassRunner {
             public void evaluate() throws Throwable {
                 ArcObjectsInitializer.getInstance().init();
                 try {
-                    ArcObjectsTestRunner.super.classBlock(notifier).evaluate();
+                    ArcObjectsIntegrationTestRunner.super.classBlock(notifier).evaluate();
                 } finally {
                     ArcObjectsInitializer.getInstance().shutdown();
                 }

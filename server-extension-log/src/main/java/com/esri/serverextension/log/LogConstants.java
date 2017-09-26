@@ -12,7 +12,7 @@
  * limitations under the License.​
  */
 
-package com.esri.serverextension.core.util;
+package com.esri.serverextension.log;
 
 public class LogConstants {
 

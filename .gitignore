@@ -52,3 +52,4 @@ server-extension-java.iml
 server-extension-template/server-extension-template.iml
 server-extension-template/target/
 target/
+*.iml

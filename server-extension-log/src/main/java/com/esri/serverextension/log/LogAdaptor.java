@@ -12,7 +12,7 @@
  * limitations under the License.​
  */
 
-package com.esri.serverextension.core.util;
+package com.esri.serverextension.log;
 
 import com.esri.arcgis.system.ILog2;
 import org.slf4j.helpers.FormattingTuple;
@@ -84,7 +84,7 @@ public class LogAdaptor extends MarkerIgnoringBase {
                 log.addMessage(level, LogConstants.LOG_MESSAGE_CODE_UNKNOWN,
                         writer.toString());
             } catch (IOException e) {
-                throw new ArcObjectsInteropException(
+                throw new RuntimeException(
                         "Cannot write log message.", e);
             }
         }
@@ -282,7 +282,7 @@ public class LogAdaptor extends MarkerIgnoringBase {
         try {
             return log.willLog(level);
         } catch (IOException e) {
-            throw new ArcObjectsInteropException(e);
+            throw new LogException(e);
         }
     }
 }
