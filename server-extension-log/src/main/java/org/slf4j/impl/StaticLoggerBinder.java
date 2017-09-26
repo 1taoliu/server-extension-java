@@ -14,18 +14,15 @@
 
 package org.slf4j.impl;
 
-import com.esri.serverextension.core.util.LogAdaptorFactory;
+import com.esri.serverextension.log.LogAdaptorFactory;
 import org.slf4j.ILoggerFactory;
 
 public class StaticLoggerBinder {
 
-    public static String REQUESTED_API_VERSION = "1.7.24";
-
     private static final StaticLoggerBinder SINGLETON = new StaticLoggerBinder();
-
     private static final String LOGGER_FACTORY_CLASS_STR = LogAdaptorFactory.class
             .getName();
-
+    public static String REQUESTED_API_VERSION = "1.7.25";
     private final ILoggerFactory loggerFactory;
 
     private StaticLoggerBinder() {

@@ -22,7 +22,7 @@ import org.junit.runner.RunWith;
 import java.io.IOException;
 
 @RunWith(ArcObjectsIntegrationTestRunner.class)
-public class ArcObjectsTestRunnerIT {
+public class ArcObjectsIntegrationTestRunnerIT {
 
     @Test
     public void runTest() throws IOException {

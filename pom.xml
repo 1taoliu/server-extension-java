@@ -28,12 +28,14 @@
         <module>examples/clustering-soe</module>
         <module>examples/quantization-soe</module>
         <module>server-extension-test</module>
+        <module>server-extension-log</module>
     </modules>
     <properties>
         <jdk.version>1.8</jdk.version>
         <com.esri.arcgis.version>10.5.1</com.esri.arcgis.version>
-        <org.springframework.version>4.3.6.RELEASE</org.springframework.version>
+        <org.springframework.version>4.3.11.RELEASE</org.springframework.version>
         <junit.version>4.12</junit.version>
+        <org.slf4j.version>1.7.25</org.slf4j.version>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
         <JAVA_HOME>${env.JAVA_HOME}</JAVA_HOME>
@@ -55,49 +57,32 @@
     </profiles>
     <dependencies>
         <dependency>
+            <groupId>org.slf4j</groupId>
+            <artifactId>slf4j-api</artifactId>
+            <version>${org.slf4j.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.slf4j</groupId>
+            <artifactId>jcl-over-slf4j</artifactId>
+            <version>${org.slf4j.version}</version>
+            <scope>test</scope>
+        </dependency>
+        <!-- Test Dependencies -->
+        <dependency>
             <groupId>junit</groupId>
             <artifactId>junit</artifactId>
             <version>${junit.version}</version>
             <scope>test</scope>
         </dependency>
         <dependency>
-            <groupId>org.slf4j</groupId>
-            <artifactId>slf4j-api</artifactId>
-            <version>1.7.24</version>
-        </dependency>
-        <dependency>
-            <groupId>ch.qos.logback</groupId>
-            <artifactId>logback-core</artifactId>
-            <version>1.2.1</version>
-        </dependency>
-        <dependency>
-            <groupId>org.apache.commons</groupId>
-            <artifactId>commons-lang3</artifactId>
-            <version>3.5</version>
-        </dependency>
-        <!-- Test Depdencies -->
-        <dependency>
             <groupId>org.springframework</groupId>
             <artifactId>spring-test</artifactId>
             <scope>test</scope>
         </dependency>
         <dependency>
-            <groupId>log4j</groupId>
-            <artifactId>log4j</artifactId>
-            <version>1.2.17</version>
-            <scope>test</scope>
-        </dependency>
-        <dependency>
-            <groupId>org.slf4j</groupId>
-            <artifactId>jcl-over-slf4j</artifactId>
-            <version>1.7.24</version>
-            <scope>test</scope>
-        </dependency>
-
-        <dependency>
-            <groupId>net.jcip</groupId>
-            <artifactId>jcip-annotations</artifactId>
-            <version>1.0</version>
+            <groupId>ch.qos.logback</groupId>
+            <artifactId>logback-classic</artifactId>
+            <version>1.2.3</version>
             <scope>test</scope>
         </dependency>
     </dependencies>
@@ -105,7 +90,7 @@
         <plugins>
             <plugin>
                 <artifactId>maven-compiler-plugin</artifactId>
-                <version>3.5.1</version>
+                <version>3.7.0</version>
                 <configuration>
                     <source>${jdk.version}</source>
                     <target>${jdk.version}</target>
@@ -115,15 +100,18 @@
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-surefire-plugin</artifactId>
-                <version>2.19.1</version>
+                <version>2.20.1</version>
                 <configuration>
                     <workingDirectory>target</workingDirectory>
+                    <classpathDependencyExcludes>
+                        <classpathDependencyExclude>com.esri.serverextensions:server-extension-log</classpathDependencyExclude>
+                    </classpathDependencyExcludes>
                 </configuration>
             </plugin>
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-failsafe-plugin</artifactId>
-                <version>2.19.1</version>
+                <version>2.20.1</version>
                 <executions>
                     <execution>
                         <goals>
@@ -137,11 +125,11 @@
                         ArcObject's classes. It requires a properly activated installation of ArcGIS
                         for Sever. -->
                     <argLine>-Djava.library.path="${env.AGSSERVER}/bin"</argLine>
-                    <forkCount>0</forkCount>
+                    <forkCount>1</forkCount>
                     <reuseForks>true</reuseForks>
-                    <!--<excludes>-->
-                        <!--<exclude>**/*IT.java</exclude>-->
-                    <!--</excludes>-->
+                    <classpathDependencyExcludes>
+                        <classpathDependencyExclude>com.esri.serverextensions:server-extension-log</classpathDependencyExclude>
+                    </classpathDependencyExcludes>
                 </configuration>
             </plugin>
         </plugins>

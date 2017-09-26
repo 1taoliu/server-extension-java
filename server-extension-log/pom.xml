@@ -22,8 +22,18 @@
         <version>0.3.0</version>
     </parent>
     <modelVersion>4.0.0</modelVersion>
-
     <artifactId>server-extension-log</artifactId>
-
+    <name>server-extension-log</name>
+    <description>SLF4J binding for ArcGIS Server.</description>
+    <packaging>jar</packaging>
+    <dependencies>
+        <dependency>
+            <groupId>com.esri.arcgis</groupId>
+            <artifactId>arcobjects</artifactId>
+            <version>${com.esri.arcgis.version}</version>
+            <scope>system</scope>
+            <systemPath>${env.AGSSERVER}\framework\lib\arcobjects.jar</systemPath>
+        </dependency>
+    </dependencies>
 
 </project>

@@ -23,7 +23,7 @@ import com.esri.serverextension.core.util.ArcObjectsInitializer;
 import com.esri.serverextension.core.util.ArcObjectsUtilities;
 import com.esri.serverextension.core.util.StopWatch;
 import com.esri.serverextension.test.AbstractArcObjectsIT;
-import net.jcip.annotations.NotThreadSafe;
+import com.esri.serverextension.test.ArcObjectsSpringIntegrationTestRunner;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.test.context.ContextConfiguration;
@@ -33,10 +33,9 @@ import javax.inject.Inject;
 import java.io.IOException;
 import java.util.List;
 
-@RunWith(SpringJUnit4ClassRunner.class)
-@NotThreadSafe
+@RunWith(ArcObjectsSpringIntegrationTestRunner.class)
 @ContextConfiguration(locations = {"/spring/config/applicationContext-file-gdb-workspace-test.xml"})
-public class ClusterAssemblerIT extends AbstractArcObjectsIT {
+public class ClusterAssemblerIT {
 
     @Inject
     private IWorkspace workspace;
@@ -46,7 +45,7 @@ public class ClusterAssemblerIT extends AbstractArcObjectsIT {
         assembleClusters("Issue_Date >= date '2017-01-01 00:00:00'");
     }
 
-    public void assembleClusters(String where) throws IOException {
+    private void assembleClusters(String where) throws IOException {
         System.out.println("Step 1: Setting up query filter.");
         IFeatureClass featureClass = ((IFeatureWorkspace)workspace).openFeatureClass("Permit_Features");
         SpatialFilter spatialFilter = new SpatialFilter();
@@ -85,18 +84,5 @@ public class ClusterAssemblerIT extends AbstractArcObjectsIT {
             System.out.println(String.format("Cluster %1$d: (x: %2$f y: %3$f), %4$f", ++clusterCount,
                     cluster.getPoint().x, cluster.getPoint().y, cluster.getValue()));
         }
-    }
-
-    public static void main(String[] args) throws Exception {
-        StopWatch timer = StopWatch.createAndStart();
-        ArcObjectsInitializer.getInstance().init();
-        FileGDBWorkspaceFactoryBean fileGDBWorkspaceFactoryBean = new FileGDBWorkspaceFactoryBean();
-        fileGDBWorkspaceFactoryBean.setDatabase("D:\\Development\\Projects\\sever-extension-java\\examples\\clustering-soe\\data\\Clustering\\Clustering.gdb");
-        IWorkspace workspace = fileGDBWorkspaceFactoryBean.getObject();
-        ClusterAssemblerIT clusterAssemblerIT = new ClusterAssemblerIT();
-        clusterAssemblerIT.workspace = workspace;
-        clusterAssemblerIT.assembleClusters("Issue_Date >= date '2016-01-01 00:00:00'");
-        ArcObjectsInitializer.getInstance().shutdown();
-        System.out.println(String.format("Time elapsed: %1$f", timer.stop().elapsedTimeSeconds()));
     }
 }
