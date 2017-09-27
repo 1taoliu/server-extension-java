@@ -38,9 +38,6 @@ public class UriPath {
             pathBuilder.append('/');
         }
         if (!StringUtils.isEmpty(resource)) {
-            if (resource.charAt(0) != '/'){
-                pathBuilder.append('/');
-            }
             pathBuilder.append(resource);
         }
         if (!StringUtils.isEmpty(operation)) {
