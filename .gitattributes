@@ -1,5 +1,6 @@
 *.gdbindexes filter=lfs diff=lfs merge=lfs -text
 *.gdbtable filter=lfs diff=lfs merge=lfs -text
+*.gdbtablx filter=lfs diff=lfs merge=lfs -text
 *.atx filter=lfs diff=lfs merge=lfs -text
 *.spx filter=lfs diff=lfs merge=lfs -text
 *.freelist filter=lfs diff=lfs merge=lfs -text
