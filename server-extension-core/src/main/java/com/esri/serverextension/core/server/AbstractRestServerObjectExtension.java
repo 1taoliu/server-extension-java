@@ -231,6 +231,8 @@ public abstract class AbstractRestServerObjectExtension implements
 
             String path = new UriPath(resourceName, operationName).getPath();
 
+            logger.debug("Path="+path);
+
             RestResponse response = null;
             RestDelegate delegate = delegateMappings.getMatchingDelegate(path);
             if (delegate != null) {
