@@ -65,14 +65,15 @@ public class QueryOperationDelegate {
     }
 
 
-    @RequestMapping("/layers/0/query")
+    @RequestMapping("/layers/{layerId}/query")
     public RestResponse query(
+            @PathVariable("layerId") int layerId,
             RestRequest request,
             RestDelegate handler,
             ServerObjectExtensionContext serverContext,
             SecurityContext securityContext) throws IOException {
 
-        int layerId = 0;
+        //int layerId = 0;
         String requestInput = request.getOperationInput();
         logger.debug("Request Input:" + requestInput);
         QuantizationQueryOperationInput quantizationInput = objectMapper.readValue(

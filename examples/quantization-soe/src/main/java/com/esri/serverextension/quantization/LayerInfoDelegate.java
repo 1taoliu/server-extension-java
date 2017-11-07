@@ -34,8 +34,8 @@ public class LayerInfoDelegate {
 
     protected final Logger logger = LoggerFactory.getLogger(LayerInfoDelegate.class);
     @Order(0)
-    @RequestMapping("//layers/0")
-    public RestResponse query(
+    @RequestMapping("//layers/{layerId}")
+    public RestResponse query(@PathVariable("layerId") int layerId,
             RestRequest request,
             RestDelegate handler) throws IOException {
         logger.debug("LayerInfo Delegate ...!!!");
