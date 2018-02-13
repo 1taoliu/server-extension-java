@@ -111,8 +111,9 @@ public class ServerObjectExtensionContext {
 
 
     /**
-     * Returns the extension name (MapServer, FeatureServer, etc.)
-     * @return the extension name as a String
+     * Returns the extension name if one exists (FeatureServer, etc.)
+     * This will return null if no extension is used (i.e. request is to /MapServer endpoint)
+     * @return the extension name as a String, or null if none exists
      */
     public String getExtensionName() {
         Map<String, Object> serverProperties = this.getServerObjectProperties();
