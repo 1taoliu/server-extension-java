@@ -108,4 +108,14 @@ public class ServerObjectExtensionContext {
         }
         return null;
     }
+
+
+    /**
+     * Returns the extension name (MapServer, FeatureServer, etc.)
+     * @return the extension name as a String
+     */
+    public String getExtensionName() {
+        Map<String, Object> serverProperties = this.getServerObjectProperties();
+        return (String) serverProperties.get("ExtensionName");
+    }
 }
