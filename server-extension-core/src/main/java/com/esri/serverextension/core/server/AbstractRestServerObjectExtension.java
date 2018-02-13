@@ -306,8 +306,7 @@ public abstract class AbstractRestServerObjectExtension implements
             String extensionName = (String) serverProperties
                     .get("ExtensionName");
             if (extensionName == null || extensionName.isEmpty()) {
-                // No extension has been set - return reference to parent parent
-                // server object
+                // No extension has been set - return reference to parent server object
                 if (TypeChecker.instanceOf(serverObject,
                         IRESTRequestHandler.class)) {
                     return new IRESTRequestHandlerProxy(serverObject);
