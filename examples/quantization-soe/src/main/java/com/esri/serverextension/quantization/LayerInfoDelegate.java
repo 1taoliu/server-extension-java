@@ -34,8 +34,8 @@ public class LayerInfoDelegate {
 
     protected final Logger logger = LoggerFactory.getLogger(LayerInfoDelegate.class);
     @Order(0)
-    @RequestMapping("//layers/0")
-    public RestResponse query(
+    @RequestMapping("//layers/{layerId}")
+    public RestResponse query(@PathVariable("layerId") int layerId,
             RestRequest request,
             RestDelegate handler) throws IOException {
         logger.debug("LayerInfo Delegate ...!!!");
@@ -43,7 +43,14 @@ public class LayerInfoDelegate {
         RestResponse response =  handler.process(request, null);
 
         JSONObject jsonObject = new JSONObject(new String(response.getResponseBody(), "utf-8"));
-        jsonObject.put("supportsCoordinateQuantization", true);
+        jsonObject.put("supportsCoordinatesQuantization", true);
+
+        JSONObject advObject = jsonObject.getJSONObject("advancedQueryCapabilities");
+        advObject.put("supportsReturningGeometryCentroid", true);
+
+        //Not sure if I have to put this out again to take affect, documentation really doesn't say.
+        //this is what would need to happen if it doesn't show.
+        jsonObject.put("advancedQueryCapabilities", advObject);
 
         byte[] data = jsonObject.toString().getBytes("utf-8");
         return new RestResponse(null, data);

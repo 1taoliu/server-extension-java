@@ -145,7 +145,9 @@ public class QuantizationCallbackHandler implements GeodatabaseObjectCallbackHan
                     if (entry.getValue() == null) {
                         jsonAttributes.put(entry.getKey(), "null");
                     } else {
-                        jsonAttributes.put(entry.getKey(), entry.getValue().toString());
+                        //OBJECTID was getting sent back as string
+                        //jsonAttributes.put(entry.getKey(), entry.getValue().toString());
+                        jsonAttributes.put(entry.getKey(), entry.getValue());
                     }
                 }
             }
