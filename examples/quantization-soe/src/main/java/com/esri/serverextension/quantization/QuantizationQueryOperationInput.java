@@ -29,7 +29,7 @@ public class QuantizationQueryOperationInput extends QueryMapServiceLayerOperati
 
     private QuantizationParameters quantizationParameters;
     private String resultType;
-    private Boolean returnCentroid = true;
+    private Boolean returnCentroid = false;
     private Boolean returnExceededLimitFeatures = true;
     /*
     private Extent bbox;

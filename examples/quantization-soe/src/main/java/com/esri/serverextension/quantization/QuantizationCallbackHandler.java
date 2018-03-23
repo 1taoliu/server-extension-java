@@ -36,6 +36,7 @@ import java.util.List;
 import java.util.Map;
 import com.esri.arcgis.server.json.JSONObject;
 import com.esri.arcgis.server.json.JSONArray;
+import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import sun.java2d.pipe.SpanShapeRenderer;
@@ -52,17 +53,30 @@ public class QuantizationCallbackHandler implements GeodatabaseObjectCallbackHan
     private double qTolerance = 1.0;
     private String shapeFieldName;
     private QuantizationQueryOperationInput input;
+    private boolean bUpperLeft = true;
+    private int recordOffset = 0;
 
 
     public QuantizationCallbackHandler(QuantizationQueryOperationInput input, String shapeFieldName) {
         this.input = input;
+
+
         this.quantizationParameters = input.getQuantizationParameters();
         this.shapeFieldName = shapeFieldName;
         if (this.quantizationParameters != null){
+            if (StringUtils.isNotEmpty(this.quantizationParameters.getOriginPosition()) && this.quantizationParameters.getOriginPosition().equalsIgnoreCase("lowerLeft")){
+                this.bUpperLeft = false;
+            }
+
             Extent extent = this.quantizationParameters.getExtent();
             if (extent != null){
                 originX = extent.getXmin();
-                originY = extent.getYmax();
+                if (this.bUpperLeft){
+                    originY = extent.getYmax();
+                }else{
+                    originY = extent.getYmin();
+                }
+
                 qTolerance = this.quantizationParameters.getTolerance();
             }
 
@@ -104,6 +118,24 @@ public class QuantizationCallbackHandler implements GeodatabaseObjectCallbackHan
 
     @Override
     public void processFeature(IFeature feature) throws IOException {
+
+        //Probably a better way to do this, but this is logically correct.
+        //Should do it at the cursor level...and have this function return true or false to signify done.
+        if (this.input.getResultOffset() != null){
+            if (recordOffset < this.input.getResultOffset()){
+                recordOffset++;
+                return;
+            }
+        }
+
+        if (this.input.getResultRecordCount() != null){
+            if (quantizedFeatures.length() >= this.input.getResultRecordCount()){
+                return;
+            }
+        }
+        //
+        //
+
         IGeometry geometry = feature.getShape();
 
         if (geometry instanceof IPolygon && !geometry.isEmpty()) {
@@ -407,6 +439,11 @@ public class QuantizationCallbackHandler implements GeodatabaseObjectCallbackHan
         return Math.round((x-originX)/qTolerance);
     }
     private long snapY(double y){
-        return Math.round((originY-y)/qTolerance);
+        if (this.bUpperLeft){
+            return Math.round((originY-y)/qTolerance);
+        }else{
+            return Math.round((y-originY)/qTolerance);
+        }
+
     }
 }
