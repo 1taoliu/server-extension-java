@@ -47,7 +47,7 @@ public class GeodatabaseFieldMap {
     public void initialize(IFields fields, String subFields) {
         try {
             String[] subFieldsArr = null;
-            if (StringUtils.isNotEmpty(subFields) || !"*".equals(subFields)) {
+            if (StringUtils.isNotEmpty(subFields) && !"*".equals(subFields)) {
                 subFieldsArr = subFields.split(",");
             }
             int fieldCount = fields.getFieldCount();
