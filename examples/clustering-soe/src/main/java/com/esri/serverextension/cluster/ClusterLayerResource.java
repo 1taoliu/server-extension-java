@@ -19,6 +19,7 @@ import com.esri.arcgis.geodatabase.*;
 import com.esri.arcgis.geometry.IPoint;
 import com.esri.arcgis.geometry.ISpatialReference;
 import com.esri.arcgis.geometry.Point;
+import com.esri.arcgis.geometry.esriGeometryType;
 import com.esri.arcgis.interop.Cleaner;
 import com.esri.arcgis.server.json.JSONObject;
 import com.esri.serverextension.core.geodatabase.GeodatabaseTemplate;
@@ -67,10 +68,11 @@ public class ClusterLayerResource {
                             ServerObjectExtensionContext serverContext) {
         try {
             IFeatureClass featureClass = MapServerUtilities.getPointFeatureClassByLayerID(layerId, serverContext);
+            int shapeType = featureClass.getShapeType();
+            if (shapeType != esriGeometryType.esriGeometryPoint) {
+
+            }
             IQueryFilter queryFilter = getQueryFilter(input, featureClass.getShapeFieldName());
-            ClusterAssemblerCallbackHandler clusterAssemblerCallbackHandler = new ClusterAssemblerCallbackHandler(input.getClusterField());
-            GeodatabaseTemplate geodatabaseTemplate = new GeodatabaseTemplate();
-            geodatabaseTemplate.query(featureClass, queryFilter, clusterAssemblerCallbackHandler);
             ClusterExtent clusterExtent = new ClusterExtent(
                     input.getBbox().getXmin(),
                     input.getBbox().getYmin(),
@@ -78,11 +80,18 @@ public class ClusterLayerResource {
                     input.getBbox().getYmax()
             );
             ClusterAssembler clusterAssembler = new ClusterAssembler(
-                    clusterAssemblerCallbackHandler.getClusterFeatures(),
                     input.getMapUnitsPerPixel(),
                     input.getClusterDistanceInPixels(),
                     clusterExtent
             );
+            ClusterAssemblerCallbackHandler clusterAssemblerCallbackHandler =
+                    new ClusterAssemblerCallbackHandler(clusterAssembler, input.getClusterField());
+            try {
+                GeodatabaseTemplate geodatabaseTemplate = new GeodatabaseTemplate();
+                geodatabaseTemplate.query(featureClass, queryFilter, clusterAssemblerCallbackHandler);
+            } finally {
+                clusterAssemblerCallbackHandler.destroy();
+            }
 
             FeatureSet featureSet = new FeatureSet();
             featureSet.setDisplayFieldName(input.getClusterField());
@@ -93,6 +102,7 @@ public class ClusterLayerResource {
             featureSet.setFields(fields);
             featureSet.setSpatialReference(getOutSpatialReference(input, serverContext));
             featureSet.setGeometryType(GeometryType.esriGeometryPoint);
+            clusterAssembler.fixClusters();
             List<Cluster> clusters = clusterAssembler.getClusters();
             if (!CollectionUtils.isEmpty(clusters)) {
                 List<Feature> features = new ArrayList<>(clusterAssembler.getClusters().size());
@@ -148,8 +158,8 @@ public class ClusterLayerResource {
                 queryFilter.setWhereClause(input.getWhere());
             }
             if (StringUtils.isNotEmpty(input.getOrderByFields())) {
-                ((IQueryFilterDefinition)queryFilter).setPostfixClause(String.format(
-                 "ORDER BY %1$s", input.getOrderByFields()
+                ((IQueryFilterDefinition) queryFilter).setPostfixClause(String.format(
+                        "ORDER BY %1$s", input.getOrderByFields()
                 ));
             }
             queryFilter.setSpatialResolution(100000.0d);
