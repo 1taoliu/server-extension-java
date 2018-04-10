@@ -80,7 +80,8 @@ public class QueryOperationDelegate {
                 requestInput, QuantizationQueryOperationInput.class);
 
 
-        if (quantizationInput != null && quantizationInput.getResultType() != null && quantizationInput.getResultType().equalsIgnoreCase("tile")){
+//        if (quantizationInput != null && quantizationInput.getResultType() != null && quantizationInput.getResultType().equalsIgnoreCase("tile")){
+        if (quantizationInput != null && quantizationInput.getQuantizationParameters() != null){
 
             IMapLayerInfo layerInfo = MapServerUtilities.getPolygonFeatureLayerByID(layerId, serverContext);
 
@@ -108,7 +109,11 @@ public class QueryOperationDelegate {
 
             QuantizationParameters params =  quantizationInput.getQuantizationParameters();
             logger.debug("Quantization Parameters:" + params);
+            boolean bUpperLeft = true;
             if (params != null){
+                if (StringUtils.isNotEmpty(params.getOriginPosition()) & params.getOriginPosition().equalsIgnoreCase("lowerLeft")){
+                    bUpperLeft = false;
+                }
                 logger.debug("Mode:"+params.getMode());
                 logger.debug("Origin Position:"+params.getOriginPosition());
                 logger.debug("Tolerance:"+params.getTolerance());
@@ -139,14 +144,24 @@ public class QueryOperationDelegate {
             rootResource.put("features", quantizationCallbackHandler.getQuantizationFeatures());
 
             JSONObject jsonTransform = new JSONObject();
-            jsonTransform.put("originPosition", "upperLeft");
+            if (bUpperLeft){
+                jsonTransform.put("originPosition", "upperLeft");
+            }else{
+                jsonTransform.put("originPosition", "lowerLeft");
+            }
+
             JSONArray jsonScale = new JSONArray();
             jsonScale.put(params.getTolerance());
             jsonScale.put(params.getTolerance());
             jsonTransform.put("scale", jsonScale);
             JSONArray jsonTranslate = new JSONArray();
             jsonTranslate.put(params.getExtent().getXmin());
-            jsonTranslate.put(params.getExtent().getYmax());
+            if (bUpperLeft){
+                jsonTranslate.put(params.getExtent().getYmax());
+            }else{
+                jsonTranslate.put(params.getExtent().getYmin());
+            }
+
             jsonTransform.put("translate", jsonTranslate);
             rootResource.put("transform", jsonTransform);
 
@@ -237,6 +252,12 @@ public class QueryOperationDelegate {
                 queryFilter.setWhereClause(input.getWhere());
             }
 
+            if (StringUtils.isNotEmpty(input.getOrderByFields())) {
+                ((IQueryFilterDefinition)queryFilter).setPostfixClause(String.format(
+                        "ORDER BY %1$s", input.getOrderByFields()
+                ));
+            }
+
             String outFields = input.getOutFields();
             if (outFields != null && outFields.length()>0){
                 String allFields[] = outFields.split(",");
@@ -247,7 +268,9 @@ public class QueryOperationDelegate {
                     }
                 }
                 if (!bFoundShape){
-                    outFields = outFields+","+shapeFieldName;
+                    if (!outFields.equalsIgnoreCase("*")){
+                        outFields = outFields+","+shapeFieldName;
+                    }
                 }
                 queryFilter.setSubFields(outFields);
             }
