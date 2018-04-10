@@ -2,13 +2,7 @@
 <module org.jetbrains.idea.maven.project.MavenProjectsManager.isMavenModule="true" type="JAVA_MODULE" version="4">
   <component name="FacetManager">
     <facet type="Spring" name="Spring">
-      <configuration>
-        <fileset id="fileset" name="Spring Application Context" removed="false">
-          <file>file://$MODULE_DIR$/src/main/java/com/esri/serverextension/quantization/QuantizationSOIConfig.java</file>
-          <file>file://$MODULE_DIR$/../../server-extension-core/src/main/java/com/esri/serverextension/core/server/DefaultConfig.java</file>
-          <file>file://$MODULE_DIR$/src/test/resources/spring/config/applicationContext-file-gdb-workspace-test.xml</file>
-        </fileset>
-      </configuration>
+      <configuration />
     </facet>
   </component>
   <component name="NewModuleRootManager" LANGUAGE_LEVEL="JDK_1_8">
