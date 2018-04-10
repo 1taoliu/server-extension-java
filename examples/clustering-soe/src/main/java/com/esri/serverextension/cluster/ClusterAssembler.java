@@ -14,19 +14,24 @@
 
 package com.esri.serverextension.cluster;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
 
 /**
- * Assembles the clustering
+ * Assembles the clustering. Features need to be sorted by the {@link ClusterFeature}'s value for clusters to be
+ * repeatable across the same set of features.
  */
 public class ClusterAssembler {
 
+    private final Logger logger = LoggerFactory.getLogger(ClusterAssembler.class);
+
     //The grid's extent
     private ClusterExtent _extent;
-
 
     //cellsize of grid
     private double _cellSize;
@@ -39,27 +44,34 @@ public class ClusterAssembler {
     //number of columns in grid
     private int    _numRows;
 
-
     //the cells which keeps the clustering info
     private Map<Integer, ArrayList<Cluster>> _cells;
 
     //the desired cluster distance in pixels
     private double _clusterDistanceInPixels;
 
-    //All the clusters which are created
+    //all the clusters which are created
     private ArrayList<Cluster> _clusters;
 
+    //number of features from which clusters were built
+    private long _numFeatures;
 
     /**
      * Assemble the clustering
-     * @param features all the features
      * @param mapUnitsPerPixel map units per pixel (like meters per pixel)
      * @param clusterDistanceInPixels cluster distance in pixels
      * @param extent the extent in real world coordinates
      */
-    public ClusterAssembler(ArrayList<ClusterFeature> features, double mapUnitsPerPixel,
+    public ClusterAssembler(double mapUnitsPerPixel,
                             double clusterDistanceInPixels, ClusterExtent extent){
-        addAllFeatures(features, mapUnitsPerPixel, clusterDistanceInPixels, extent);
+        _cells = new HashMap<> ();
+        _mapUnitsPerPixel = mapUnitsPerPixel;
+        _clusterDistanceInPixels = clusterDistanceInPixels;
+        _cellSize = mapUnitsPerPixel * _clusterDistanceInPixels;
+        _extent = extent;
+        _numColumns = getGridColumn(extent.getXMax())+1;
+        _numRows = getGridRow(extent.getYMax())+1;
+        _clusters = new ArrayList<>();
     }
 
     /**
@@ -70,81 +82,32 @@ public class ClusterAssembler {
         return _clusters;
     }
 
-
-    //Adds all the features. Called internally by the ctor
-    private void addAllFeatures(ArrayList<ClusterFeature> features, double mapUnitsPerPixel,
-                                double clusterDistanceInPixels, ClusterExtent extent
-                               ){
-        _cells = new HashMap<> ();
-        _mapUnitsPerPixel = mapUnitsPerPixel;
-        _clusterDistanceInPixels = clusterDistanceInPixels;
-        _cellSize = mapUnitsPerPixel * _clusterDistanceInPixels;
-        _extent = extent;
-        _numColumns = getGridColumn(extent.getXMax())+1;
-        _numRows = getGridRow(extent.getYMax())+1;
-        _clusters = new ArrayList<>();
-
-        //first sort the features based on the clusterfieldIndex
-        // Sorting by Lambda
-        Collections.sort(features, (ClusterFeature feature2, ClusterFeature feature1)->
-                ((Double)feature1.getValue()).compareTo(feature2.getValue()));
-
-
-        /* JAVA 1.7
-        Collections.sort(features, new Comparator<ClusterFeature>() {
-            @Override
-            public int compare(ClusterFeature feature2, ClusterFeature feature1)
-            {
-                return  ((Double)feature1.getValue()).compareTo((Double)feature2.getValue());
-            }
-        });
-        */
-
-        for (ClusterFeature feature:features){
-            addFeature(feature);
-        }
-
-
-
-        for (Cluster cluster:_clusters){
-            fixCluster(cluster);
-        }
-
-
-        for (Cluster cluster:_clusters){
-            fixCluster(cluster);
-        }
-
-/*
-        System.out.println("+++++++++++++++++++++++++++++++++++++");
-        for (Cluster cluster:_clusters){
-            examineCluster(cluster);
-        }
-*/
-/*
-        for (Cluster cluster:_clusters){
-            cluster.print();
-        }
-*/
-
-    }
-
-
-
-
     /**
      * Add a feature
      * @param feature
      */
-    private void addFeature(ClusterFeature feature) {
-        Cluster closestCluster = getClosestCluster(feature.getPoint());
+    public void addFeature(ClusterFeature feature) {
+        _numFeatures++;
+//        Cluster closestCluster = getClosestCluster(feature.getPoint());
+//        if (closestCluster != null) {
+//            addFeatureToCluster(feature, closestCluster);
+//        }else{
+//            createCluster(feature);//create new cluster
+//        }
+//
+//        if (logger.isDebugEnabled()) {
+//            if (_numFeatures % 100 == 0)
+//            logger.debug(String.format("Added %1$d cluster features.", _numFeatures));
+//        }
+    }
 
-        if (closestCluster != null) {
-            addFeatureToCluster(feature, closestCluster);
-        }else{
-            createCluster(feature);//create new cluster
-        }
-
+    /**
+     * Returns the number of features used to built clusters.
+     *
+     * @return number of features
+     */
+    public long getNumberOfFeatures() {
+        return _numFeatures;
     }
 
     //from yValue real-world, what is the grid row
@@ -303,7 +266,16 @@ public class ClusterAssembler {
     }
 
 
+    public void fixClusters() {
+        for (Cluster cluster:_clusters){
+            fixCluster(cluster);
+        }
 
+        for (Cluster cluster:_clusters){
+            fixCluster(cluster);
+        }
+
+    }
 
     public void fixCluster(Cluster cluster) {
         double distance = _cellSize;//this._mapUnitsPerPixel*this._clusterDistanceInPixels;

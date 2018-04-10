@@ -26,6 +26,8 @@ import com.esri.serverextension.test.AbstractArcObjectsIT;
 import com.esri.serverextension.test.ArcObjectsSpringIntegrationTestRunner;
 import org.junit.Test;
 import org.junit.runner.RunWith;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
@@ -37,6 +39,8 @@ import java.util.List;
 @ContextConfiguration(locations = {"/spring/config/applicationContext-file-gdb-workspace-test.xml"})
 public class ClusterAssemblerIT {
 
+    private final Logger logger = LoggerFactory.getLogger(ClusterAssemblerIT.class);
+
     @Inject
     private IWorkspace workspace;
 
@@ -46,7 +50,7 @@ public class ClusterAssemblerIT {
     }
 
     private void assembleClusters(String where) throws IOException {
-        System.out.println("Step 1: Setting up query filter.");
+        logger.info("Step 1: Setting up query filter.");
         IFeatureClass featureClass = ((IFeatureWorkspace)workspace).openFeatureClass("Permit_Features");
         SpatialFilter spatialFilter = new SpatialFilter();
         spatialFilter.setSubFields("Valuation,Shape");
@@ -62,26 +66,29 @@ public class ClusterAssemblerIT {
         spatialFilter.setWhereClause(where);
         spatialFilter.setOutputSpatialReferenceByRef("Shape", ArcObjectsUtilities.createSpatialReference(102100));
 
-        System.out.println("Step 2: Executing query.");
-        GeodatabaseTemplate geodatabaseTemplate = new GeodatabaseTemplate();
-        ClusterAssemblerCallbackHandler clusterAssemblerCallbackHandler = new ClusterAssemblerCallbackHandler("Valuation");
-        geodatabaseTemplate.query(featureClass, spatialFilter, clusterAssemblerCallbackHandler);
-        System.out.println(String.format("# of input features: %1$d", clusterAssemblerCallbackHandler.getFeatureCount()));
-
-        System.out.println("Step 3: Building clusters.");
+        logger.info("Step 2: Configuring cluster assembler.");
         ClusterExtent clusterExtent = new ClusterExtent(-13244092.36900171,
                 4000883.3498998554,
                 -13118812.079642477,
                 4061574.350358204);
         ClusterAssembler clusterAssembler = new ClusterAssembler(
-                clusterAssemblerCallbackHandler.getClusterFeatures(),
                 76.43702828507277,
                 100,
                 clusterExtent);
+        ClusterAssemblerCallbackHandler clusterAssemblerCallbackHandler = new ClusterAssemblerCallbackHandler(
+                clusterAssembler,"Valuation");
+
+        logger.info("Step 3: Executing query.");
+        GeodatabaseTemplate geodatabaseTemplate = new GeodatabaseTemplate();
+        geodatabaseTemplate.query(featureClass, spatialFilter, clusterAssemblerCallbackHandler);
+        logger.info(String.format("# of input features: %1$d", clusterAssembler.getNumberOfFeatures()));
+
+        logger.info("Step 4: Building clusters.");
+        clusterAssembler.fixClusters();
         List<Cluster> clusters = clusterAssembler.getClusters();
         int clusterCount = 0;
         for (Cluster cluster : clusters) {
-            System.out.println(String.format("Cluster %1$d: (x: %2$f y: %3$f), %4$f", ++clusterCount,
+            logger.info(String.format("Cluster %1$d: (x: %2$f y: %3$f), %4$f", ++clusterCount,
                     cluster.getPoint().x, cluster.getPoint().y, cluster.getValue()));
         }
     }

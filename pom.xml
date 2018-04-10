@@ -17,7 +17,7 @@
     <modelVersion>4.0.0</modelVersion>
     <groupId>com.esri.serverextensions</groupId>
     <artifactId>server-extension-java</artifactId>
-    <version>0.3.0</version>
+    <version>0.4.0</version>
     <name>server-extension-java</name>
     <description>A template project for creating Server Object Extensions and Server Object Interceptors</description>
     <packaging>pom</packaging>
@@ -32,8 +32,8 @@
     </modules>
     <properties>
         <jdk.version>1.8</jdk.version>
-        <com.esri.arcgis.version>10.5.1</com.esri.arcgis.version>
-        <org.springframework.version>4.3.11.RELEASE</org.springframework.version>
+        <com.esri.arcgis.version>10.6.0</com.esri.arcgis.version>
+        <org.springframework.version>5.0.3.RELEASE</org.springframework.version>
         <junit.version>4.12</junit.version>
         <org.slf4j.version>1.7.25</org.slf4j.version>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
@@ -100,7 +100,7 @@
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-surefire-plugin</artifactId>
-                <version>2.19.1</version>
+                <version>2.20.1</version>
                 <configuration>
                     <workingDirectory>target</workingDirectory>
                     <classpathDependencyExcludes>
@@ -111,7 +111,7 @@
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-failsafe-plugin</artifactId>
-                <version>2.19.1</version>
+                <version>2.20.1</version>
                 <executions>
                     <execution>
                         <goals>
@@ -124,7 +124,7 @@
                     <!-- The java library path property is require for actual testing of
                         ArcObject's classes. It requires a properly activated installation of ArcGIS
                         for Sever. -->
-                    <argLine>-Djava.library.path="${env.AGSSERVER}/bin"</argLine>
+                    <argLine>-Djava.library.path="${env.AGSSERVER}bin"</argLine>
                     <forkCount>1</forkCount>
                     <reuseForks>true</reuseForks>
                     <classpathDependencyExcludes>

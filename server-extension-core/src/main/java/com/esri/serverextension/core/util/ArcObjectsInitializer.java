@@ -39,7 +39,6 @@ public class ArcObjectsInitializer {
     public void init() throws UnknownHostException, IOException {
         EngineInitializer.initializeServer(esriProductCode.esriProductCodeServerStandardEdition);
         this.aoInit = new AoInitialize();
-
         if (aoInit
                 .isProductCodeAvailable(esriLicenseProductCode.esriLicenseProductCodeArcServer) == esriLicenseStatus.esriLicenseAvailable) {
             aoInit.initialize(esriLicenseProductCode.esriLicenseProductCodeArcServer);

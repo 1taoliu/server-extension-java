@@ -16,34 +16,39 @@ package com.esri.serverextension.cluster;
 
 import com.esri.arcgis.geodatabase.IFeature;
 import com.esri.arcgis.geodatabase.IRow;
+import com.esri.arcgis.geometry.GeometryEnvironment;
 import com.esri.arcgis.geometry.IGeometry;
+import com.esri.arcgis.geometry.IGeometryFactory2;
 import com.esri.arcgis.geometry.IPoint;
+import com.esri.arcgis.system.Cleaner;
 import com.esri.serverextension.core.geodatabase.GeodatabaseFieldMap;
 import com.esri.serverextension.core.geodatabase.GeodatabaseObjectCallbackHandler;
 
 import java.io.IOException;
+import java.nio.ByteBuffer;
+import java.nio.ByteOrder;
 import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.Map;
 
 public class ClusterAssemblerCallbackHandler implements GeodatabaseObjectCallbackHandler {
 
+    private ClusterAssembler clusterAssembler;
     private GeodatabaseFieldMap fieldMap;
     private String clusterFieldName;
     private int clusterFieldIndex = -1;
-    private int featureCount = 0;
-    private ArrayList<ClusterFeature> clusterFeatures = new ArrayList<>();
+    private IGeometryFactory2 geometryFactory;
 
-    public ClusterAssemblerCallbackHandler(String clusterFieldName) {
+    public ClusterAssemblerCallbackHandler(ClusterAssembler clusterAssembler, String clusterFieldName) {
+        this.clusterAssembler = clusterAssembler;
         this.clusterFieldName = clusterFieldName;
     }
 
-    public int getFeatureCount() {
-        return featureCount;
-    }
-
-    public ArrayList<ClusterFeature> getClusterFeatures() {
-        return clusterFeatures;
+    public void destroy() {
+        if (geometryFactory != null) {
+            Cleaner.release(geometryFactory);
+            geometryFactory = null;
+        }
     }
 
     @Override
@@ -59,24 +64,42 @@ public class ClusterAssemblerCallbackHandler implements GeodatabaseObjectCallbac
 
     @Override
     public void processFeature(IFeature feature) throws IOException {
-        featureCount++;
         Map<String, Object> attributes = new LinkedHashMap<>();
         for (GeodatabaseFieldMap.FieldIndex fieldIndex : fieldMap.getFieldIndices()) {
             attributes.put(fieldIndex.getField().getName(), feature.getValue(fieldIndex.getIndex()));
         }
-        IGeometry geometry = feature.getShape();
-        if (geometry instanceof IPoint && !geometry.isEmpty()) {
-            IPoint point = (IPoint)geometry;
-            ClusterPoint clusterPoint = new ClusterPoint(point.getX(), point.getY());
-            Object value = feature.getValue(clusterFieldIndex);
-            if (value == null) {
-                return;
-            }
-            if (value instanceof Number) {
-                ClusterFeature clusterFeature = new ClusterFeature(clusterPoint,
-                        ((Number) value).doubleValue());
-                clusterFeatures.add(clusterFeature);
-            }
+        if (geometryFactory == null) {
+            geometryFactory = new GeometryEnvironment();
         }
+        IGeometry geometry = feature.getShape();
+        byte[] wkbGeometry = (byte[]) geometryFactory.createWkbVariantFromGeometry(geometry);
+        ClusterPoint clusterPoint = readClusterPoint(wkbGeometry);
+        Object value = feature.getValue(clusterFieldIndex);
+        if (value == null) {
+            return;
+        }
+        if (value instanceof Number) {
+            ClusterFeature clusterFeature = new ClusterFeature(clusterPoint,
+                    ((Number) value).doubleValue());
+            clusterAssembler.addFeature(clusterFeature);
+        }
+    }
+
+    private ClusterPoint readClusterPoint(byte[] bytes){
+        int byteOrder = bytes[0];
+        ByteBuffer buf = ByteBuffer.wrap(bytes);
+        if (byteOrder == 1){
+            buf.order(ByteOrder.LITTLE_ENDIAN);
+        }
+
+        buf.get();
+        int geomType = buf.getInt();
+        if (geomType != 1){
+            throw new IllegalArgumentException(String.format("Unexpected geometry type: %1$d. Expected 1 (point).", geomType));
+        }
+
+        double x = buf.getDouble();
+        double y = buf.getDouble();
+        return new ClusterPoint(x, y);
     }
 }
