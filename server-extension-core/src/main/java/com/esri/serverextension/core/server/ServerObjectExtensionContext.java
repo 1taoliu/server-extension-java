@@ -108,4 +108,23 @@ public class ServerObjectExtensionContext {
         }
         return null;
     }
+
+    /**
+     * Returns the extension name if one exists (FeatureServer, etc.)
+     * This will return null if no extension is used (i.e. request is to /MapServer endpoint)
+     * @return the extension name as a String, or null if none exists
+     */
+    public String getExtensionName() {
+        Map<String, Object> serverProperties = this.getServerObjectProperties();
+        return (String) serverProperties.get("ExtensionName");
+    }
+
+    /**
+     * Returns the cfg type if one exists (MapServer, etc.)
+     * @return the cfg type as a String
+     */
+    public String getCfgType() {
+        Map<String, Object> serverProperties = this.getServerObjectProperties();
+        return (String) serverProperties.get("CfgType");
+    }
 }
