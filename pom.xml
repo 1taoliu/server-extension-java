@@ -26,7 +26,6 @@
         <module>server-extension-template</module>
         <module>examples/attribute-security-filter-soi</module>
         <module>examples/clustering-soe</module>
-        <module>examples/quantization-soe</module>
         <module>server-extension-test</module>
         <module>server-extension-log</module>
     </modules>
