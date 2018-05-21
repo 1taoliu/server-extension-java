@@ -1,1 +1,0 @@
-Indexing D:\Development\Projects\sever-extension-java\examples\quantization-soe\data\Quantization\Quantization.aprx
