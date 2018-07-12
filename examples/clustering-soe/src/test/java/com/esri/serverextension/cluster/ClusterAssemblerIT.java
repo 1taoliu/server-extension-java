@@ -16,13 +16,9 @@ package com.esri.serverextension.cluster;
 
 import com.esri.arcgis.geodatabase.*;
 import com.esri.arcgis.geometry.IEnvelope;
-import com.esri.serverextension.core.geodatabase.FileGDBWorkspaceFactoryBean;
 import com.esri.serverextension.core.geodatabase.GeodatabaseTemplate;
 import com.esri.serverextension.core.rest.json.JSONGeometryMapper;
-import com.esri.serverextension.core.util.ArcObjectsInitializer;
 import com.esri.serverextension.core.util.ArcObjectsUtilities;
-import com.esri.serverextension.core.util.StopWatch;
-import com.esri.serverextension.test.AbstractArcObjectsIT;
 import com.esri.serverextension.test.ArcObjectsSpringIntegrationTestRunner;
 import org.junit.Assert;
 import org.junit.Test;
@@ -30,7 +26,6 @@ import org.junit.runner.RunWith;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.test.context.ContextConfiguration;
-import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
 import javax.inject.Inject;
 import java.io.IOException;
