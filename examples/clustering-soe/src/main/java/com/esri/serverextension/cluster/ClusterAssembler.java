@@ -88,17 +88,17 @@ public class ClusterAssembler {
      */
     public void addFeature(ClusterFeature feature) {
         _numFeatures++;
-//        Cluster closestCluster = getClosestCluster(feature.getPoint());
-//        if (closestCluster != null) {
-//            addFeatureToCluster(feature, closestCluster);
-//        }else{
-//            createCluster(feature);//create new cluster
-//        }
-//
-//        if (logger.isDebugEnabled()) {
-//            if (_numFeatures % 100 == 0)
-//            logger.debug(String.format("Added %1$d cluster features.", _numFeatures));
-//        }
+        Cluster closestCluster = getClosestCluster(feature.getPoint());
+        if (closestCluster != null) {
+            addFeatureToCluster(feature, closestCluster);
+        }else{
+            createCluster(feature);//create new cluster
+        }
+
+        if (logger.isDebugEnabled()) {
+            if (_numFeatures % 100 == 0)
+            logger.debug(String.format("Added %1$d cluster features.", _numFeatures));
+        }
     }
 
     /**

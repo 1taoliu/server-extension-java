@@ -24,6 +24,7 @@ import com.esri.serverextension.core.util.ArcObjectsUtilities;
 import com.esri.serverextension.core.util.StopWatch;
 import com.esri.serverextension.test.AbstractArcObjectsIT;
 import com.esri.serverextension.test.ArcObjectsSpringIntegrationTestRunner;
+import org.junit.Assert;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.slf4j.Logger;
@@ -86,7 +87,8 @@ public class ClusterAssemblerIT {
         logger.info("Step 4: Building clusters.");
         clusterAssembler.fixClusters();
         List<Cluster> clusters = clusterAssembler.getClusters();
-        int clusterCount = 0;
+        int clusterCount = clusters.size();
+        Assert.assertTrue(clusterCount > 0);
         for (Cluster cluster : clusters) {
             logger.info(String.format("Cluster %1$d: (x: %2$f y: %3$f), %4$f", ++clusterCount,
                     cluster.getPoint().x, cluster.getPoint().y, cluster.getValue()));
